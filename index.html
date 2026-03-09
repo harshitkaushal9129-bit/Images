@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Audio Thumbnail Injector</title>
+    <title>Audio Thumbnail Tool</title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#22c55e">
@@ -13,65 +13,75 @@
     <script src="https://unpkg.com/browser-id3-writer@4.4.0/dist/browser-id3-writer.js"></script>
 
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0f172a; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .container { background: #1e293b; padding: 2.5rem; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.6); width: 380px; text-align: center; }
-        h2 { margin-top: 0; color: #f8fafc; font-size: 1.5rem; }
-        label { display: block; text-align: left; margin: 10px 0 5px; font-size: 0.9rem; color: #94a3b8; }
-        input { margin-bottom: 20px; width: 100%; color: #94a3b8; background: #0f172a; padding: 8px; border-radius: 5px; border: 1px solid #334155; }
-        button { background: #22c55e; color: white; border: none; padding: 14px; border-radius: 10px; cursor: pointer; font-weight: bold; width: 100%; transition: all 0.3s ease; font-size: 1rem; }
-        button:hover { background: #16a34a; transform: translateY(-2px); }
-        button:active { transform: translateY(0); }
-        .status { margin-top: 20px; font-size: 0.85rem; padding: 10px; border-radius: 8px; background: rgba(251, 191, 36, 0.1); color: #fbbf24; min-height: 20px; }
+        body { font-family: 'Segoe UI', sans-serif; background: #0f172a; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .container { background: #1e293b; padding: 2rem; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.5); width: 350px; text-align: center; }
+        h2 { color: #f8fafc; margin-bottom: 20px; }
+        .box { background: #0f172a; border: 1px dashed #334155; padding: 15px; border-radius: 10px; margin-bottom: 15px; }
+        label { display: block; font-size: 0.8rem; color: #94a3b8; margin-bottom: 8px; text-align: left; }
+        input { width: 100%; color: #94a3b8; font-size: 0.8rem; }
+        button { background: #22c55e; color: white; border: none; padding: 15px; border-radius: 10px; cursor: pointer; font-weight: bold; width: 100%; transition: 0.3s; font-size: 1rem; margin-top: 10px; }
+        button:hover { background: #16a34a; transform: scale(1.02); }
+        .status { margin-top: 15px; font-size: 0.85rem; color: #fbbf24; min-height: 20px; line-height: 1.4; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>Audio Thumbnail Tool</h2>
+    <h2>Audio Tool</h2>
     
-    <label>1. Select MP3 Audio:</label>
-    <input type="file" id="audioInput" accept="audio/mpeg, audio/mp3">
+    <div class="box">
+        <label>MP3 Audio File:</label>
+        <input type="file" id="audioInput" accept="audio/mpeg, audio/mp3">
+    </div>
+
+    <div class="box">
+        <label>Cover Image (JPG/PNG):</label>
+        <input type="file" id="imageInput" accept="image/jpeg, image/png">
+    </div>
     
-    <label>2. Select Cover Image (JPG/PNG):</label>
-    <input type="file" id="imageInput" accept="image/jpeg, image/png">
+    <button id="processBtn" onclick="processAudio()">Inject & Download</button>
     
-    <button onclick="processAudio()">Inject & Download</button>
-    
-    <div class="status" id="status">Files select karke "Inject" par click karein.</div>
+    <div class="status" id="status">Files select karein...</div>
 </div>
 
 <script>
-// 1. Service Worker Registration
+// Service Worker Register
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js')
-            .then(() => console.log("PWA Active"))
-            .catch(err => console.log("SW Error", err));
+        navigator.serviceWorker.register('./sw.js').catch(() => {});
     });
 }
 
-// 2. Audio Processing Logic
 async function processAudio() {
-    const audioFile = document.getElementById('audioInput').files[0];
-    const imageFile = document.getElementById('imageInput').files[0];
+    const audioInput = document.getElementById('audioInput');
+    const imageInput = document.getElementById('imageInput');
     const status = document.getElementById('status');
+    const btn = document.getElementById('processBtn');
 
-    if (!audioFile || !imageFile) {
-        alert("Kripya dono files (Audio aur Image) select karein!");
+    if (!audioInput.files[0] || !imageInput.files[0]) {
+        alert("Audio aur Image dono select karein!");
         return;
     }
 
-    status.innerText = "Processing... Please wait.";
+    // Processing Start
+    status.innerText = "Processing... Zyada memory use ho sakti hai.";
+    btn.disabled = true;
+    btn.style.opacity = "0.5";
 
     try {
-        // Buffers read karein
-        const audioBuffer = await audioFile.arrayBuffer();
-        const imageBuffer = await imageFile.arrayBuffer();
+        const audioFile = audioInput.files[0];
+        const imageFile = imageInput.files[0];
 
-        // ID3 Writer Setup
+        // Read files as ArrayBuffer
+        const [audioBuffer, imageBuffer] = await Promise.all([
+            audioFile.arrayBuffer(),
+            imageFile.arrayBuffer()
+        ]);
+
+        // ID3 Writer Logic
         const writer = new ID3Writer(audioBuffer);
         
-        // Front Cover (Type 3) add karein
+        // Add Image
         writer.setFrame('APIC', {
             type: 3,
             data: imageBuffer,
@@ -79,17 +89,17 @@ async function processAudio() {
             usePictureTypeFromData: true
         });
 
-        // Song Title set karein (Filename se extension hatakar)
-        const cleanTitle = audioFile.name.replace(/\.[^/.]+$/, "");
-        writer.setFrame('TIT2', cleanTitle);
+        // Add Title (Cleanup filename)
+        const title = audioFile.name.replace(/\.[^/.]+$/, "");
+        writer.setFrame('TIT2', title);
 
         writer.addTag();
 
-        // Final Blob generate karein
-        const taggedUint8 = writer.arrayBuffer;
-        const finalBlob = new Blob([taggedUint8], { type: 'audio/mpeg' });
+        // Memory Safe Blob Creation
+        const resultBuffer = writer.arrayBuffer;
+        const finalBlob = new Blob([new Uint8Array(resultBuffer)], { type: 'audio/mpeg' });
         
-        // Download Trigger
+        // Automatic Download
         const url = URL.createObjectURL(finalBlob);
         const a = document.createElement('a');
         a.href = url;
@@ -97,19 +107,22 @@ async function processAudio() {
         document.body.appendChild(a);
         a.click();
         
-        // Memory Cleanup
+        // Immediate Memory Cleanup
         setTimeout(() => {
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
-        }, 200);
+            status.style.color = "#4ade80";
+            status.innerText = "Download Success! Check your music player.";
+            btn.disabled = false;
+            btn.style.opacity = "1";
+        }, 500);
 
-        status.style.color = "#4ade80";
-        status.innerText = "Done! Audio download ho gaya.";
-        
     } catch (error) {
         console.error(error);
         status.style.color = "#f87171";
-        status.innerText = "Error: File process nahi ho saki.";
+        status.innerText = "Error: File process nahi hui. Chhoti image try karein.";
+        btn.disabled = false;
+        btn.style.opacity = "1";
     }
 }
 </script>
