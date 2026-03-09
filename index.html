@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Audio Thumbnail Injector</title>
+      <link rel="manifest" href="manifest.json">
+
+    
     <script src="https://unpkg.com/browser-id3-writer@4.4.0/dist/browser-id3-writer.js"></script>
     <style>
         body { font-family: sans-serif; background: #0f172a; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
@@ -29,6 +32,19 @@
     
     <div class="status" id="status">Files select karein...</div>
 </div>
+    <link rel="manifest" href="manifest.json">
+
+<script>
+  // Service Worker Registration
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js')
+        .then(reg => console.log('Service Worker Registered!'))
+        .catch(err => console.log('Registration Failed:', err));
+    });
+  }
+</script>
+
 
 <script>
 async function processAudio() {
