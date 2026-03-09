@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio Thumbnail Injector</title>
+    <script src="https://unpkg.com/browser-id3-writer@4.4.0/dist/browser-id3-writer.js"></script>
+    <style>
+        body { font-family: sans-serif; background: #0f172a; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .container { background: #1e293b; padding: 2rem; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); width: 350px; text-align: center; }
+        input { margin: 15px 0; width: 100%; color: #94a3b8; }
+        button { background: #22c55e; color: white; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; transition: 0.3s; }
+        button:hover { background: #16a34a; }
+        .status { margin-top: 15px; font-size: 0.9rem; color: #fbbf24; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Audio Thumbnail Tool</h2>
+    
+    <label>Select MP3 Audio:</label>
+    <input type="file" id="audioInput" accept="audio/*">
+    
+    <label>Select Image (JPG/PNG):</label>
+    <input type="file" id="imageInput" accept="image/*">
+    
+    <button onclick="processAudio()">Inject & Download</button>
+    
+    <div class="status" id="status">Files select karein...</div>
+</div>
+
+<script>
+async function processAudio() {
+    const audioFile = document.getElementById('audioInput').files[0];
+    const imageFile = document.getElementById('imageInput').files[0];
+    const status = document.getElementById('status');
+
+    if (!audioFile || !imageFile) {
+        alert("Kripya dono files (Audio aur Image) select karein!");
+        return;
+    }
+
+    status.innerText = "Processing... Please wait.";
+
+    try {
+        // 1. Audio file ko ArrayBuffer mein convert karein
+        const audioBuffer = await audioFile.arrayBuffer();
+        
+        // 2. Image file ko ArrayBuffer mein convert karein
+        const imageBuffer = await imageFile.arrayBuffer();
+
+        // 3. ID3 Writer initialize karein
+        const writer = new ID3Writer(audioBuffer);
+        
+        // 4. Image (APIC tag) aur Title set karein
+        writer.setFrame('APIC', {
+            type: 3, // Cover (front)
+            data: imageBuffer,
+            description: 'Cover',
+            usePictureTypeFromData: true
+        }).setFrame('TIT2', audioFile.name.replace('.mp3', '')); // Title set karna zaroori hai
+
+        writer.addTag();
+
+        // 5. Blob banakar download link generate karein
+        const taggedBlob = writer.getBlob();
+        const url = URL.createObjectURL(taggedBlob);
+        
+        const downloadLink = document.createElement('a');
+        downloadLink.href = url;
+        downloadLink.download = "Cover_" + audioFile.name;
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
+
+        status.innerText = "Done! Audio download ho gaya.";
+        
+    } catch (error) {
+        console.error(error);
+        status.innerText = "Error: Kuch galat hua!";
+    }
+}
+</script>
+
+</body>
+</html>
