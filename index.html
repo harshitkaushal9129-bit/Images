@@ -1,131 +1,303 @@
 <!DOCTYPE html>
 <html lang="hi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Audio Thumbnail Tool</title>
-    
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#22c55e">
-    <meta name="mobile-web-app-capable" content="yes">
-    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/727/727218.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kaushal Mi Player - Local & API Media Hub</title>
+<style>
+:root{--bg-color:#f0f2f5;--header-bg:#1e293b;--card-bg:#ffffff;--text-color:#334155;--card-text:#333333;--input-border:#cbd5e1;--primary-color:#2563eb;--title-color:#38bdf8;}
+body.dark-theme{--bg-color:#0f172a;--header-bg:#1e293b;--card-bg:#1e293b;--text-color:#f8fafc;--card-text:#f1f5f9;--input-border:#475569;--title-color:#38bdf8;}
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;}
+body{background-color:var(--bg-color);color:var(--text-color);transition:background 0.3s;padding-bottom:50px;}
 
-    <script src="https://unpkg.com/browser-id3-writer@4.4.0/dist/browser-id3-writer.js"></script>
+/* Header Customizations */
+header{background-color:var(--header-bg);color:white;display:flex;justify-content:space-between;align-items:center;padding:12px 20px;box-shadow:0 2px 10px rgba(0,0,0,0.15);position:relative;z-index:100;}
+.header-title{font-size:20px;font-weight:bold;color:var(--title-color);}
+.header-right{display:flex;align-items:center;gap:15px;}
+.icon-btn{background:none;border:none;color:white;font-size:22px;cursor:pointer;padding:4px;transition:0.2s;}
+.icon-btn:hover{color:var(--title-color);}
 
-    <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #0f172a; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .container { background: #1e293b; padding: 2rem; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.5); width: 350px; text-align: center; }
-        h2 { color: #f8fafc; margin-bottom: 20px; }
-        .box { background: #0f172a; border: 1px dashed #334155; padding: 15px; border-radius: 10px; margin-bottom: 15px; }
-        label { display: block; font-size: 0.8rem; color: #94a3b8; margin-bottom: 8px; text-align: left; }
-        input { width: 100%; color: #94a3b8; font-size: 0.8rem; }
-        button { background: #22c55e; color: white; border: none; padding: 15px; border-radius: 10px; cursor: pointer; font-weight: bold; width: 100%; transition: 0.3s; font-size: 1rem; margin-top: 10px; }
-        button:hover { background: #16a34a; transform: scale(1.02); }
-        .status { margin-top: 15px; font-size: 0.85rem; color: #fbbf24; min-height: 20px; line-height: 1.4; }
-    </style>
+/* Slide Panels */
+.side-panel{position:fixed;top:0;right:-320px;width:300px;height:100%;background:var(--card-bg);color:var(--card-text);box-shadow:-5px 0 25px rgba(0,0,0,0.3);z-index:1000;transition:right 0.3s ease;padding:20px;overflow-y:auto;}
+.side-panel.open{right:0;}
+.panel-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;border-bottom:1px solid var(--input-border);padding-bottom:10px;}
+.panel-header h3{color:var(--primary-color);}
+.close-panel{background:none;border:none;font-size:22px;cursor:pointer;color:inherit;}
+
+/* Category Boxes in Media Panel */
+.category-grid{display:flex;flex-direction:column;gap:12px;}
+.category-card{background:rgba(0,0,0,0.04);padding:14px;border-radius:8px;cursor:pointer;border:1px solid var(--input-border);font-weight:bold;transition:0.2s;display:flex;justify-content:space-between;align-items:center;}
+.category-card:hover{background:var(--primary-color);color:white;border-color:var(--primary-color);}
+
+/* General Layout Styles */
+.nav-tabs{display:flex;justify-content:center;background:var(--header-bg);border-top:1px solid rgba(255,255,255,0.1);}
+.nav-tabs button{background:none;border:none;color:#94a3b8;padding:14px 20px;font-size:15px;font-weight:bold;cursor:pointer;transition:0.3s;}
+.nav-tabs button.active,.nav-tabs button:hover{color:white;border-bottom:3px solid var(--title-color);}
+.container{max-width:1100px;margin:30px auto;padding:0 20px;}
+.section-title{text-align:center;margin-bottom:25px;font-size:24px;color:var(--text-color);}
+.form-container{background:var(--card-bg);color:var(--card-text);padding:25px 30px;border-radius:10px;box-shadow:0 4px 20px rgba(0,0,0,0.08);max-width:500px;margin:0 auto;}
+.form-group{margin-bottom:15px;}
+.form-group label{display:block;margin-bottom:6px;font-size:14px;font-weight:600;}
+.form-group input,.form-group select{width:100%;padding:10px;border:1px solid var(--input-border);border-radius:6px;font-size:14px;background:transparent;color:inherit;}
+.submit-btn{width:100%;padding:12px;background-color:var(--primary-color);color:white;border:none;border-radius:6px;font-size:16px;font-weight:bold;cursor:pointer;margin-top:10px;}
+.submit-btn:hover{background-color:#1d4ed8;}
+.media-view-box{background:var(--card-bg);padding:20px;border-radius:10px;box-shadow:0 4px 15px rgba(0,0,0,0.05);margin-top:20px;}
+.media-item{padding:10px;border-bottom:1px solid var(--input-border);display:flex;justify-content:space-between;align-items:center;}
+.hidden{display:none !important;}
+</style>
 </head>
 <body>
 
-<div class="container">
-    <h2>Audio Tool</h2>
-    
-    <div class="box">
-        <label>MP3 Audio File:</label>
-        <input type="file" id="audioInput" accept="audio/mpeg, audio/mp3">
-    </div>
+<header>
+  <div class="header-title">Kaushal Mi Player</div>
+  <div class="header-right">
+    <!-- 3 Arrows / Menu Icon -->
+    <button class="icon-btn" onclick="toggleAppMenu()" title="App Tools">🔀</button>
+    <!-- 3 Dots Icon -->
+    <button class="icon-btn" onclick="toggleMediaPanel()" title="Media Categories">⋮</button>
+  </div>
+</header>
 
-    <div class="box">
-        <label>Cover Image (JPG/PNG):</label>
-        <input type="file" id="imageInput" accept="image/jpeg, image/png">
-    </div>
-    
-    <button id="processBtn" onclick="processAudio()">Inject & Download</button>
-    
-    <div class="status" id="status">Files select karein...</div>
+<!-- Navigation Tabs -->
+<div class="nav-tabs">
+  <button id="tabAuthBtn" class="active" onclick="switchTab('auth')">Login / Register</button>
+  <button id="tabPlayerBtn" onclick="switchTab('player')">Mi Player Hub</button>
 </div>
 
-<script>
-// Service Worker Register
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js').catch(() => {});
-    });
-}
+<div class="container">
+  
+  <!-- Auth Section (Login & Registration) -->
+  <div id="authSection">
+    <div class="form-container">
+      <h3 id="authTitle" style="margin-bottom:15px;color:var(--primary-color);text-align:center;">User Registration</h3>
+      <form id="authForm">
+        <div class="form-group" id="nameGroup">
+          <label>Full Name *</label>
+          <input type="text" id="authName" placeholder="Enter your name">
+        </div>
+        <div class="form-group">
+          <label>Mobile Number / Username *</label>
+          <input type="tel" id="authMobile" placeholder="10 Digit Mobile Number" required>
+        </div>
+        <div class="form-group">
+          <label>Password *</label>
+          <input type="password" id="authPass" placeholder="Enter password" required>
+        </div>
+        <button type="submit" id="authSubmitBtn" class="submit-btn">Register Now</button>
+      </form>
+      <p style="text-align:center;margin-top:15px;font-size:14px;">
+        <span id="toggleAuthModeText">Already registered? <a href="#" onclick="switchAuthMode(event)" style="color:var(--primary-color);">Login here</a></span>
+      </p>
+    </div>
+  </div>
 
-async function processAudio() {
-    const audioInput = document.getElementById('audioInput');
-    const imageInput = document.getElementById('imageInput');
-    const status = document.getElementById('status');
-    const btn = document.getElementById('processBtn');
+  <!-- Player Hub Section -->
+  <div id="playerSection" class="hidden">
+    <h2 class="section-title" id="welcomeUserTitle">Welcome to Kaushal Mi Player</h2>
+    <div class="media-view-box">
+      <h3 id="currentCategoryTitle" style="color:var(--primary-color);margin-bottom:15px;">Select a category from 3-dots menu</h3>
+      <div id="mediaContentList">
+        <p style="text-align:center;opacity:0.7;padding:20px;">Right side ke 3 dots (⋮) par click karke Videos, Audios, PDFs ya Images category select karein.</p>
+      </div>
+    </div>
+  </div>
 
-    if (!audioInput.files[0] || !imageInput.files[0]) {
-        alert("Audio aur Image dono select karein!");
+</div>
+
+<!-- Right Slide Panel: 4 Media Categories (3 Dots Menu) -->
+<div class="side-panel" id="mediaPanel">
+  <div class="panel-header">
+    <h3>Media Categories</h3>
+    <button class="close-panel" onclick="toggleMediaPanel()">&times;</button>
+  </div>
+  <div class="category-grid">
+    <div class="category-card" onclick="loadMediaCategory('videos')"><span>🎬 Videos</span><span>▶</span></div>
+    <div class="category-card" onclick="loadMediaCategory('audios')"><span>🎵 Audios</span><span>▶</span></div>
+    <div class="category-card" onclick="loadMediaCategory('pdfs')"><span>📄 PDFs / Docs</span><span>▶</span></div>
+    <div class="category-card" onclick="loadMediaCategory('images')"><span>🖼️ Images</span><span>▶</span></div>
+  </div>
+</div>
+
+<!-- Right Slide Panel: App Tools & Info (3 Arrows Menu) -->
+<div class="side-panel" id="appMenuPanel">
+  <div class="panel-header">
+    <h3>App Tools & Info</h3>
+    <button class="close-panel" onclick="toggleAppMenu()">&times;</button>
+  </div>
+  <div class="category-grid">
+    <div class="category-card" onclick="toggleTheme()"><span>🌓 Toggle Dark/Light Mode</span></div>
+    <div class="category-card" onclick="showUserInfo()"><span>👤 User Info</span></div>
+    <div class="category-card" onclick="showDeveloperInfo()"><span>💻 Developer Info</span></div>
+    <div class="category-card" onclick="logoutUser()" style="background:#fee2e2;color:#991b1b;border-color:#fca5a5;"><span>🚪 Logout</span></div>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
+import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-database.js";
+
+const firebaseConfig = { apiKey: "AIzaSyCM0GFOIbXogloRj9cwWeNdk2PjCzm4gFE", authDomain: "kaushal-institute-729bc.firebaseapp.com", databaseURL: "https://kaushal-institute-729bc-default-rtdb.firebaseio.com", projectId: "kaushal-institute-729bc", storageBucket: "kaushal-institute-729bc.firebasestorage.app", messagingSenderId: "699990199933", appId: "1:699990199933:web:e5fae383e93de5d3c6ab14" };
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+let isLoginMode = false;
+
+// Sample API & Local Storage Hybrid Media Data
+const sampleMediaAPI = {
+  videos: [
+    { title: "HTML & CSS Crash Course", url: "https://www.w3schools.com/html/mov_bbb.mp4", source: "API Server" },
+    { title: "JavaScript Basics Tutorial", url: "https://www.w3schools.com/html/mov_bbb.mp4", source: "Local Storage" }
+  ],
+  audios: [
+    { title: "Motivational Speech Audio", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3", source: "API Server" }
+  ],
+  pdfs: [
+    { title: "NIELIT O-Level Study Guide", url: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf", source: "API Server" }
+  ],
+  images: [
+    { title: "Kaushal Institute Banner", url: "https://via.placeholder.com/400x200/2563eb/ffffff?text=Kaushal+Mi+Player", source: "Local Storage" }
+  ]
+};
+
+window.toggleMediaPanel = function() {
+  document.getElementById('mediaPanel').classList.toggle('open');
+  document.getElementById('appMenuPanel').classList.remove('open');
+};
+
+window.toggleAppMenu = function() {
+  document.getElementById('appMenuPanel').classList.toggle('open');
+  document.getElementById('mediaPanel').classList.remove('open');
+};
+
+window.switchTab = function(tab) {
+  const loggedUser = localStorage.getItem('miPlayerUser');
+  if(tab === 'player' && !loggedUser) {
+    alert("Pehle Login ya Register karein!");
+    return;
+  }
+  document.getElementById('authSection').classList.toggle('hidden', tab !== 'auth');
+  document.getElementById('playerSection').classList.toggle('hidden', tab !== 'player');
+  document.getElementById('tabAuthBtn').classList.toggle('active', tab === 'auth');
+  document.getElementById('tabPlayerBtn').classList.toggle('active', tab === 'player');
+};
+
+window.switchAuthMode = function(e) {
+  e.preventDefault();
+  isLoginMode = !isLoginMode;
+  document.getElementById('authTitle').innerText = isLoginMode ? "User Login" : "User Registration";
+  document.getElementById('authSubmitBtn').innerText = isLoginMode ? "Login" : "Register Now";
+  document.getElementById('nameGroup').style.display = isLoginMode ? "none" : "block";
+  document.getElementById('toggleAuthModeText').innerHTML = isLoginMode ? 
+    `Don't have an account? <a href="#" onclick="switchAuthMode(event)" style="color:var(--primary-color);">Register here</a>` :
+    `Already registered? <a href="#" onclick="switchAuthMode(event)" style="color:var(--primary-color);">Login here</a>`;
+};
+
+// Handle Registration / Login Form Submit
+document.getElementById('authForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  const mobile = document.getElementById('authMobile').value.trim();
+  const pass = document.getElementById('authPass').value.trim();
+  const name = document.getElementById('authName').value.trim() || "User";
+
+  if(isLoginMode) {
+    // Login check via LocalStorage & API/Firebase
+    let savedUser = localStorage.getItem('user_' + mobile);
+    if(savedUser) {
+      let userData = JSON.parse(savedUser);
+      if(userData.pass === pass) {
+        localStorage.setItem('miPlayerUser', JSON.stringify(userData));
+        alert("Login successful!");
+        switchTab('player');
         return;
+      }
     }
-
-    // Processing Start
-    status.innerText = "Processing... Zyada memory use ho sakti hai.";
-    btn.disabled = true;
-    btn.style.opacity = "0.5";
-
     try {
-        const audioFile = audioInput.files[0];
-        const imageFile = imageInput.files[0];
-
-        // Read files as ArrayBuffer
-        const [audioBuffer, imageBuffer] = await Promise.all([
-            audioFile.arrayBuffer(),
-            imageFile.arrayBuffer()
-        ]);
-
-        // ID3 Writer Logic
-        const writer = new ID3Writer(audioBuffer);
-        
-        // Add Image
-        writer.setFrame('APIC', {
-            type: 3,
-            data: imageBuffer,
-            description: 'Cover',
-            usePictureTypeFromData: true
-        });
-
-        // Add Title (Cleanup filename)
-        const title = audioFile.name.replace(/\.[^/.]+$/, "");
-        writer.setFrame('TIT2', title);
-
-        writer.addTag();
-
-        // Memory Safe Blob Creation
-        const resultBuffer = writer.arrayBuffer;
-        const finalBlob = new Blob([new Uint8Array(resultBuffer)], { type: 'audio/mpeg' });
-        
-        // Automatic Download
-        const url = URL.createObjectURL(finalBlob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = "Covered_" + audioFile.name;
-        document.body.appendChild(a);
-        a.click();
-        
-        // Immediate Memory Cleanup
-        setTimeout(() => {
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            status.style.color = "#4ade80";
-            status.innerText = "Download Success! Check your music player.";
-            btn.disabled = false;
-            btn.style.opacity = "1";
-        }, 500);
-
-    } catch (error) {
-        console.error(error);
-        status.style.color = "#f87171";
-        status.innerText = "Error: File process nahi hui. Chhoti image try karein.";
-        btn.disabled = false;
-        btn.style.opacity = "1";
+      const snap = await get(child(ref(db), 'mi_users/' + mobile));
+      if(snap.exists()) {
+        let userData = snap.val();
+        if(userData.pass === pass) {
+          localStorage.setItem('miPlayerUser', JSON.stringify(userData));
+          alert("Login successful from API/Cloud!");
+          switchTab('player');
+          return;
+        }
+      }
+      alert("Galat Mobile Number ya Password!");
+    } catch(err) {
+      alert("Login error occurred.");
     }
-}
-</script>
+  } else {
+    // Registration
+    let userData = { name, mobile, pass };
+    localStorage.setItem('user_' + mobile, JSON.stringify(userData));
+    localStorage.setItem('miPlayerUser', JSON.stringify(userData));
+    try {
+      await set(ref(db, 'mi_users/' + mobile), userData);
+    } catch(err) { console.log("Cloud sync skipped."); }
+    alert("Registration & Login successful!");
+    switchTab('player');
+  }
+});
 
+// Load Media Categories from API / Local Storage
+window.loadMediaCategory = function(category) {
+  toggleMediaPanel(); // Close panel after selection
+  document.getElementById('currentCategoryTitle').innerText = `${category.toUpperCase()} Collection (API & Local Storage)`;
+  const listEl = document.getElementById('mediaContentList');
+  listEl.innerHTML = "";
+
+  // Combine local storage custom media items + API sample items
+  let localItems = JSON.parse(localStorage.getItem('media_' + category) || '[]');
+  let apiItems = sampleMediaAPI[category] || [];
+  let combined = [...localItems, ...apiItems];
+
+  if(combined.length === 0) {
+    listEl.innerHTML = `<p style="text-align:center;padding:15px;">No items found in ${category}.</p>`;
+    return;
+  }
+
+  combined.forEach(item => {
+    let div = document.createElement('div');
+    div.className = "media-item";
+    let previewHTML = "";
+    if(category === 'videos') previewHTML = `<video width="120" controls src="${item.url}" style="border-radius:4px;"></video>`;
+    else if(category === 'audios') previewHTML = `<audio controls src="${item.url}" style="height:35px;width:180px;"></audio>`;
+    else if(category === 'images') previewHTML = `<img src="${item.url}" width="60" style="border-radius:4px;">`;
+    else previewHTML = `<a href="${item.url}" target="_blank" style="color:var(--primary-color);font-weight:bold;">View PDF</a>`;
+
+    div.innerHTML = `<div><strong>${item.title}</strong><br><small style="opacity:0.7;">Source: ${item.source || 'Local'}</small></div><div>${previewHTML}</div>`;
+    listEl.appendChild(div);
+  });
+};
+
+window.toggleTheme = function() {
+  document.body.classList.toggle('dark-theme');
+  localStorage.setItem('theme', document.body.classList.contains('dark-theme') ? 'dark' : 'light');
+  toggleAppMenu();
+};
+
+window.showUserInfo = function() {
+  let user = JSON.parse(localStorage.getItem('miPlayerUser') || '{}');
+  alert(`User Info:\nName: ${user.name || 'Guest'}\nMobile: ${user.mobile || 'N/A'}`);
+  toggleAppMenu();
+};
+
+window.showDeveloperInfo = function() {
+  alert("Kaushal Mi Player v2.0\nDeveloped by Computer Skills by Kaushalji\nPowered by API & Local Storage.");
+  toggleAppMenu();
+};
+
+window.logoutUser = function() {
+  localStorage.removeItem('miPlayerUser');
+  alert("Logged out successfully.");
+  switchTab('auth');
+  toggleAppMenu();
+};
+
+window.addEventListener('DOMContentLoaded', () => {
+  if(localStorage.getItem('theme') === 'dark') document.body.classList.add('dark-theme');
+  if(localStorage.getItem('miPlayerUser')) switchTab('player');
+});
+</script>
 </body>
 </html>
