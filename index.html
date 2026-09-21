@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kaushal Mi Player - File Upload Hub</title>
+<title>Kaushal Mi Player - online offline media player </title>
 <style>
 :root{--bg-color:#f0f2f5;--header-bg:#1e293b;--card-bg:#ffffff;--text-color:#334155;--card-text:#333333;--input-border:#cbd5e1;--primary-color:#2563eb;--title-color:#38bdf8;}
 body.dark-theme{--bg-color:#0f172a;--header-bg:#1e293b;--card-bg:#1e293b;--text-color:#f8fafc;--card-text:#f1f5f9;--input-border:#475569;--title-color:#38bdf8;}
@@ -208,7 +208,7 @@ let currentMediaList = [];
 let currentIndex = 0;
 
 function sanitizeEmail(email) {
-  return email.toLowerCase().replace(/[\.#\$\/\[\]]/g, "_");
+  return email ? email.toLowerCase().replace(/[\.#\$\/\[\]]/g, "_") : "";
 }
 
 window.toggleMediaPanel = function() {
@@ -257,12 +257,15 @@ document.getElementById('authForm').addEventListener('submit', async function(e)
   const pass = document.getElementById('authPass').value.trim();
   const name = document.getElementById('authName').value.trim() || "User";
   const emailKey = sanitizeEmail(email);
+  const currentDate = new Date().toLocaleDateString();
 
   if(isLoginMode) {
     let savedUser = localStorage.getItem('user_' + emailKey);
     if(savedUser) {
       let userData = JSON.parse(savedUser);
       if(userData.pass === pass) {
+        if(!userData.userId) userData.userId = emailKey;
+        if(!userData.regDate) userData.regDate = currentDate;
         localStorage.setItem('miPlayerUser', JSON.stringify(userData));
         alert("Login successful!");
         submitBtn.disabled = false;
@@ -275,6 +278,8 @@ document.getElementById('authForm').addEventListener('submit', async function(e)
       if(snap.exists()) {
         let userData = snap.val();
         if(userData.pass === pass) {
+          if(!userData.userId) userData.userId = emailKey;
+          if(!userData.regDate) userData.regDate = currentDate;
           localStorage.setItem('user_' + emailKey, JSON.stringify(userData));
           localStorage.setItem('miPlayerUser', JSON.stringify(userData));
           alert("Login successful from Cloud!");
@@ -296,7 +301,7 @@ document.getElementById('authForm').addEventListener('submit', async function(e)
       });
     }
 
-    let userData = { name, email, pass, pic: imageBase64, regDate: new Date().toLocaleDateString(), userId: emailKey };
+    let userData = { name, email, pass, pic: imageBase64, regDate: currentDate, userId: emailKey };
     localStorage.setItem('user_' + emailKey, JSON.stringify(userData));
     localStorage.setItem('miPlayerUser', JSON.stringify(userData));
     try { await set(ref(db, 'mi_users/' + emailKey), userData); } catch(err) {}
@@ -494,8 +499,8 @@ window.showUserInfoModal = function() {
   document.getElementById('modalUserPic').src = user.pic || "https://via.placeholder.com/150";
   document.getElementById('modalUserName').innerText = user.name || "Guest User";
   document.getElementById('modalUserEmail').innerText = user.email || "No Email Provided";
-  document.getElementById('modalUserKey').innerText = user.userId || "N/A";
-  document.getElementById('modalUserDate').innerText = user.regDate || "N/A";
+  document.getElementById('modalUserKey').innerText = user.userId || sanitizeEmail(user.email) || "N/A";
+  document.getElementById('modalUserDate').innerText = user.regDate || new Date().toLocaleDateString();
   document.getElementById('userInfoModal').classList.add('active');
   toggleAppMenu();
 };
