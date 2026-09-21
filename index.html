@@ -9,7 +9,6 @@
 body.dark-theme{--bg-color:#0f172a;--header-bg:#1e293b;--card-bg:#1e293b;--text-color:#f8fafc;--card-text:#f1f5f9;--input-border:#475569;--title-color:#38bdf8;}
 *{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;}
 
-/* Background Image: kaushalji.jpg */
 body{
   background: linear-gradient(rgba(15, 23, 42, 0.85), rgba(15, 23, 42, 0.85)), url('kaushalji.jpg');
   background-size: cover;
@@ -21,14 +20,12 @@ body{
   padding-bottom: 50px;
 }
 
-/* Header Customizations */
 header{background-color:var(--header-bg);color:white;display:flex;justify-content:space-between;align-items:center;padding:12px 20px;box-shadow:0 2px 10px rgba(0,0,0,0.15);position:relative;z-index:100;}
 .header-title{font-size:20px;font-weight:bold;color:var(--title-color);}
 .header-right{display:flex;align-items:center;gap:15px;}
 .icon-btn{background:none;border:none;color:white;font-size:22px;cursor:pointer;padding:4px;transition:0.2s;}
 .icon-btn:hover{color:var(--title-color);}
 
-/* Slide Panels & Modals */
 .side-panel{position:fixed;top:0;right:-320px;width:300px;height:100%;background:var(--card-bg);color:var(--card-text);box-shadow:-5px 0 25px rgba(0,0,0,0.3);z-index:1000;transition:right 0.3s ease;padding:20px;overflow-y:auto;}
 .side-panel.open{right:0;}
 .panel-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;border-bottom:1px solid var(--input-border);padding-bottom:10px;}
@@ -47,17 +44,22 @@ header{background-color:var(--header-bg);color:white;display:flex;justify-conten
 .form-container{background:var(--card-bg);color:var(--card-text);padding:25px 30px;border-radius:10px;box-shadow:0 4px 20px rgba(0,0,0,0.3);max-width:500px;margin:0 auto;}
 .form-group{margin-bottom:15px;}
 .form-group label{display:block;margin-bottom:6px;font-size:14px;font-weight:600;}
-.form-group input{width:100%;padding:10px;border:1px solid var(--input-border);border-radius:6px;font-size:14px;background:transparent;color:inherit;}
-.submit-btn{width:100%;padding:12px;background-color:var(--primary-color);color:white;border:none;border-radius:6px;font-size:16px;font-weight:bold;cursor:pointer;margin-top:10px;}
+.form-group input,.form-group select{width:100%;padding:10px;border:1px solid var(--input-border);border-radius:6px;font-size:14px;background:transparent;color:inherit;}
+.submit-btn{width:100%;padding:12px;background-color:var(--primary-color);color:white;border:none;border-radius:6px;font-size:16px;font-weight:bold;cursor:pointer;margin-top:10px;display:flex;justify-content:center;align-items:center;gap:8px;}
 .submit-btn:hover{background-color:#1d4ed8;}
-.media-view-box{background:var(--card-bg);color:var(--card-text);padding:20px;border-radius:10px;box-shadow:0 4px 15px rgba(0,0,0,0.3);margin-top:20px;}
-.media-item{padding:10px;border-bottom:1px solid var(--input-border);display:flex;justify-content:space-between;align-items:center;}
 
-/* Modal Overlay */
+.media-view-box{background:var(--card-bg);color:var(--card-text);padding:20px;border-radius:10px;box-shadow:0 4px 15px rgba(0,0,0,0.3);margin-top:20px;}
+.media-item{padding:12px;border-bottom:1px solid var(--input-border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;}
+
+/* Spinner Loader */
+.spinner{width:18px;height:18px;border:3px solid rgba(255,255,255,0.3);border-radius:50%;border-top-color:#fff;animation:spin 0.8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
 .modal-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:9999;justify-content:center;align-items:center;}
 .modal-overlay.active{display:flex;}
-.modal-box{background:var(--card-bg);color:var(--card-text);padding:25px;border-radius:10px;max-width:400px;width:90%;text-align:center;box-shadow:0 4px 25px rgba(0,0,0,0.4);position:relative;}
+.modal-box{background:var(--card-bg);color:var(--card-text);padding:25px;border-radius:10px;max-width:450px;width:90%;text-align:center;box-shadow:0 4px 25px rgba(0,0,0,0.4);position:relative;max-height:90vh;overflow-y:auto;}
 .user-profile-img{width:90px;height:90px;border-radius:50%;object-fit:cover;border:3px solid var(--primary-color);margin-bottom:15px;}
+.profile-info-row{text-align:left;margin-bottom:10px;font-size:14px;background:rgba(0,0,0,0.03);padding:8px 12px;border-radius:6px;border:1px solid var(--input-border);}
 .hidden{display:none !important;}
 </style>
 </head>
@@ -66,14 +68,11 @@ header{background-color:var(--header-bg);color:white;display:flex;justify-conten
 <header>
   <div class="header-title">Kaushal Mi Player</div>
   <div class="header-right">
-    <!-- 3 Arrows / Menu Icon -->
     <button class="icon-btn" onclick="toggleAppMenu()" title="App Tools">🔀</button>
-    <!-- 3 Dots Icon -->
     <button class="icon-btn" onclick="toggleMediaPanel()" title="Media Categories">⋮</button>
   </div>
 </header>
 
-<!-- Navigation Tabs -->
 <div class="nav-tabs">
   <button id="tabAuthBtn" class="active" onclick="switchTab('auth')">Login / Register</button>
   <button id="tabPlayerBtn" onclick="switchTab('player')">Mi Player Hub</button>
@@ -81,7 +80,6 @@ header{background-color:var(--header-bg);color:white;display:flex;justify-conten
 
 <div class="container">
   
-  <!-- Auth Section (Email Login & Registration) -->
   <div id="authSection">
     <div class="form-container">
       <h3 id="authTitle" style="margin-bottom:15px;color:var(--primary-color);text-align:center;">User Registration</h3>
@@ -102,7 +100,7 @@ header{background-color:var(--header-bg);color:white;display:flex;justify-conten
           <label>Profile Image *</label>
           <input type="file" id="authImgFile" accept="image/*" required>
         </div>
-        <button type="submit" id="authSubmitBtn" class="submit-btn">Register Now</button>
+        <button type="submit" id="authSubmitBtn" class="submit-btn"><span>Register Now</span></button>
       </form>
       <p style="text-align:center;margin-top:15px;font-size:14px;">
         <span id="toggleAuthModeText">Already registered? <a href="#" onclick="switchAuthMode(event)" style="color:var(--title-color);">Login here</a></span>
@@ -110,11 +108,36 @@ header{background-color:var(--header-bg);color:white;display:flex;justify-conten
     </div>
   </div>
 
-  <!-- Player Hub Section -->
   <div id="playerSection" class="hidden">
-    <h2 class="section-title" id="welcomeUserTitle">Welcome to Kaushal Mi Player</h2>
+    <h2 class="section-title" id="welcomeUserTitle">Mi Player Media Hub</h2>
+    
+    <!-- Add Local Storage Media Form -->
+    <div class="form-container" style="max-width:100%;margin-bottom:20px;">
+      <h4 style="color:var(--primary-color);margin-bottom:12px;">➕ Add New Media to Local Storage</h4>
+      <form id="addMediaForm" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;align-items:end;">
+        <div class="form-group" style="margin:0;">
+          <label>Category</label>
+          <select id="mediaCategorySelect">
+            <option value="videos">Video</option>
+            <option value="audios">Audio</option>
+            <option value="pdfs">PDF / Document</option>
+            <option value="images">Image</option>
+          </select>
+        </div>
+        <div class="form-group" style="margin:0;">
+          <label>Media Title</label>
+          <input type="text" id="mediaTitleInput" placeholder="Enter title" required>
+        </div>
+        <div class="form-group" style="margin:0;">
+          <label>File or URL</label>
+          <input type="text" id="mediaUrlInput" placeholder="Paste direct URL or select file below" required>
+        </div>
+        <button type="submit" class="submit-btn" style="margin:0;height:42px;">Save to Local Storage</button>
+      </form>
+    </div>
+
     <div class="media-view-box">
-      <h3 id="currentCategoryTitle" style="color:var(--primary-color);margin-bottom:15px;">Select a category from 3-dots menu</h3>
+      <h3 id="currentCategoryTitle" style="color:var(--primary-color);margin-bottom:15px;">Select a category from 3-dots (⋮) menu</h3>
       <div id="mediaContentList">
         <p style="text-align:center;opacity:0.7;padding:20px;">Right side ke 3 dots (⋮) par click karke Videos, Audios, PDFs ya Images category select karein.</p>
       </div>
@@ -123,19 +146,21 @@ header{background-color:var(--header-bg);color:white;display:flex;justify-conten
 
 </div>
 
-<!-- User Info Modal -->
+<!-- User Info Modal with Full Data -->
 <div class="modal-overlay" id="userInfoModal">
   <div class="modal-box">
     <button class="close-panel" onclick="closeUserInfoModal()" style="position:absolute;top:10px;right:15px;">&times;</button>
-    <h3 style="margin-bottom:15px;color:var(--primary-color);">User Profile Info</h3>
+    <h3 style="margin-bottom:15px;color:var(--primary-color);">Complete User Profile</h3>
     <img id="modalUserPic" src="" class="user-profile-img" alt="Profile Image">
-    <h4 id="modalUserName" style="margin-bottom:5px;"></h4>
-    <p id="modalUserEmail" style="opacity:0.8;font-size:14px;margin-bottom:15px;"></p>
-    <button class="submit-btn" onclick="closeUserInfoModal()">Close</button>
+    <div class="profile-info-row"><strong>Full Name:</strong> <span id="modalUserName"></span></div>
+    <div class="profile-info-row"><strong>Email ID:</strong> <span id="modalUserEmail"></span></div>
+    <div class="profile-info-row"><strong>Account Key/ID:</strong> <span id="modalUserKey"></span></div>
+    <div class="profile-info-row"><strong>Registration Date:</strong> <span id="modalUserDate"></span></div>
+    <button class="submit-btn" onclick="closeUserInfoModal()" style="margin-top:15px;">Close</button>
   </div>
 </div>
 
-<!-- Right Slide Panel: 4 Media Categories (3 Dots Menu) -->
+<!-- 3 Dots Menu (Media Categories) -->
 <div class="side-panel" id="mediaPanel">
   <div class="panel-header">
     <h3>Media Categories</h3>
@@ -149,7 +174,7 @@ header{background-color:var(--header-bg);color:white;display:flex;justify-conten
   </div>
 </div>
 
-<!-- Right Slide Panel: App Tools & Info (3 Arrows Menu) -->
+<!-- 3 Arrows Menu (App Tools) -->
 <div class="side-panel" id="appMenuPanel">
   <div class="panel-header">
     <h3>App Tools & Info</h3>
@@ -172,17 +197,15 @@ const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
 let isLoginMode = false;
+let currentActiveCategory = 'videos';
 
-// Helper to sanitize email for Firebase keys (dots are not allowed in keys)
 function sanitizeEmail(email) {
   return email.toLowerCase().replace(/[\.#\$\/\[\]]/g, "_");
 }
 
-// Sample API & Local Storage Hybrid Media Data
 const sampleMediaAPI = {
   videos: [
-    { title: "HTML & CSS Crash Course", url: "https://www.w3schools.com/html/mov_bbb.mp4", source: "API Server" },
-    { title: "JavaScript Basics Tutorial", url: "https://www.w3schools.com/html/mov_bbb.mp4", source: "Local Storage" }
+    { title: "HTML & CSS Crash Course", url: "https://www.w3schools.com/html/mov_bbb.mp4", source: "API Server" }
   ],
   audios: [
     { title: "Motivational Speech Audio", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3", source: "API Server" }
@@ -191,7 +214,7 @@ const sampleMediaAPI = {
     { title: "NIELIT O-Level Study Guide", url: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf", source: "API Server" }
   ],
   images: [
-    { title: "Kaushal Institute Banner", url: "https://via.placeholder.com/400x200/2563eb/ffffff?text=Kaushal+Mi+Player", source: "Local Storage" }
+    { title: "Kaushal Institute Banner", url: "https://via.placeholder.com/400x200/2563eb/ffffff?text=Kaushal+Mi+Player", source: "API Server" }
   ]
 };
 
@@ -215,13 +238,14 @@ window.switchTab = function(tab) {
   document.getElementById('playerSection').classList.toggle('hidden', tab !== 'player');
   document.getElementById('tabAuthBtn').classList.toggle('active', tab === 'auth');
   document.getElementById('tabPlayerBtn').classList.toggle('active', tab === 'player');
+  if(tab === 'player') loadMediaCategory('videos');
 };
 
 window.switchAuthMode = function(e) {
   e.preventDefault();
   isLoginMode = !isLoginMode;
   document.getElementById('authTitle').innerText = isLoginMode ? "User Login" : "User Registration";
-  document.getElementById('authSubmitBtn').innerText = isLoginMode ? "Login" : "Register Now";
+  document.getElementById('authSubmitBtn').innerHTML = `<span>${isLoginMode ? "Login" : "Register Now"}</span>`;
   document.getElementById('nameGroup').style.display = isLoginMode ? "none" : "block";
   document.getElementById('imageGroup').style.display = isLoginMode ? "none" : "block";
   document.getElementById('authImgFile').required = !isLoginMode;
@@ -231,22 +255,26 @@ window.switchAuthMode = function(e) {
     `Already registered? <a href="#" onclick="switchAuthMode(event)" style="color:var(--title-color);">Login here</a>`;
 };
 
-// Handle Registration / Login Form Submit
+// Handle Authentication with Loader Spinner
 document.getElementById('authForm').addEventListener('submit', async function(e) {
   e.preventDefault();
+  const submitBtn = document.getElementById('authSubmitBtn');
+  submitBtn.disabled = true;
+  submitBtn.innerHTML = `<div class="spinner"></div> Processing...`;
+
   const email = document.getElementById('authEmail').value.trim().toLowerCase();
   const pass = document.getElementById('authPass').value.trim();
   const name = document.getElementById('authName').value.trim() || "User";
   const emailKey = sanitizeEmail(email);
 
   if(isLoginMode) {
-    // Login check via LocalStorage first, then Firebase API
     let savedUser = localStorage.getItem('user_' + emailKey);
     if(savedUser) {
       let userData = JSON.parse(savedUser);
       if(userData.pass === pass) {
         localStorage.setItem('miPlayerUser', JSON.stringify(userData));
         alert("Login successful!");
+        submitBtn.disabled = false;
         switchTab('player');
         return;
       }
@@ -259,6 +287,7 @@ document.getElementById('authForm').addEventListener('submit', async function(e)
           localStorage.setItem('user_' + emailKey, JSON.stringify(userData));
           localStorage.setItem('miPlayerUser', JSON.stringify(userData));
           alert("Login successful from API/Cloud!");
+          submitBtn.disabled = false;
           switchTab('player');
           return;
         }
@@ -268,7 +297,6 @@ document.getElementById('authForm').addEventListener('submit', async function(e)
       alert("Login error occurred.");
     }
   } else {
-    // Registration with Image
     const imgFile = document.getElementById('authImgFile').files[0];
     let imageBase64 = "https://via.placeholder.com/150";
     if(imgFile) {
@@ -279,19 +307,40 @@ document.getElementById('authForm').addEventListener('submit', async function(e)
       });
     }
 
-    let userData = { name, email, pass, pic: imageBase64 };
+    let userData = { name, email, pass, pic: imageBase64, regDate: new Date().toLocaleDateString(), userId: emailKey };
     localStorage.setItem('user_' + emailKey, JSON.stringify(userData));
     localStorage.setItem('miPlayerUser', JSON.stringify(userData));
     try {
       await set(ref(db, 'mi_users/' + emailKey), userData);
     } catch(err) { console.log("Cloud sync skipped."); }
     alert("Registration & Login successful!");
+    submitBtn.disabled = false;
     switchTab('player');
   }
+  submitBtn.disabled = false;
+  submitBtn.innerHTML = `<span>${isLoginMode ? "Login" : "Register Now"}</span>`;
 });
 
-// Load Media Categories from API / Local Storage
+// Add Local Media Form Handler
+document.getElementById('addMediaForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  const cat = document.getElementById('mediaCategorySelect').value;
+  const title = document.getElementById('mediaTitleInput').value.trim();
+  const url = document.getElementById('mediaUrlInput').value.trim();
+
+  let localItems = JSON.parse(localStorage.getItem('media_' + cat) || '[]');
+  localItems.push({ title, url, source: 'Local Storage' });
+  localStorage.setItem('media_' + cat, JSON.stringify(localItems));
+
+  alert("Media added successfully to Local Storage!");
+  document.getElementById('mediaTitleInput').value = '';
+  document.getElementById('mediaUrlInput').value = '';
+  loadMediaCategory(cat);
+});
+
+// Load Media Categories from Local Storage & API
 window.loadMediaCategory = function(category) {
+  currentActiveCategory = category;
   toggleMediaPanel();
   document.getElementById('currentCategoryTitle').innerText = `${category.toUpperCase()} Collection (API & Local Storage)`;
   const listEl = document.getElementById('mediaContentList');
@@ -302,7 +351,7 @@ window.loadMediaCategory = function(category) {
   let combined = [...localItems, ...apiItems];
 
   if(combined.length === 0) {
-    listEl.innerHTML = `<p style="text-align:center;padding:15px;">No items found in ${category}.</p>`;
+    listEl.innerHTML = `<p style="text-align:center;padding:15px;">No items found in ${category}. Use the form above to add media.</p>`;
     return;
   }
 
@@ -310,10 +359,10 @@ window.loadMediaCategory = function(category) {
     let div = document.createElement('div');
     div.className = "media-item";
     let previewHTML = "";
-    if(category === 'videos') previewHTML = `<video width="120" controls src="${item.url}" style="border-radius:4px;"></video>`;
+    if(category === 'videos') previewHTML = `<video width="140" controls src="${item.url}" style="border-radius:4px;"></video>`;
     else if(category === 'audios') previewHTML = `<audio controls src="${item.url}" style="height:35px;width:180px;"></audio>`;
-    else if(category === 'images') previewHTML = `<img src="${item.url}" width="60" style="border-radius:4px;">`;
-    else previewHTML = `<a href="${item.url}" target="_blank" style="color:var(--title-color);font-weight:bold;">View PDF</a>`;
+    else if(category === 'images') previewHTML = `<img src="${item.url}" width="70" style="border-radius:4px;">`;
+    else previewHTML = `<a href="${item.url}" target="_blank" style="color:var(--title-color);font-weight:bold;">View PDF Document</a>`;
 
     div.innerHTML = `<div><strong>${item.title}</strong><br><small style="opacity:0.7;">Source: ${item.source || 'Local'}</small></div><div>${previewHTML}</div>`;
     listEl.appendChild(div);
@@ -331,6 +380,8 @@ window.showUserInfoModal = function() {
   document.getElementById('modalUserPic').src = user.pic || "https://via.placeholder.com/150";
   document.getElementById('modalUserName').innerText = user.name || "Guest User";
   document.getElementById('modalUserEmail').innerText = user.email || "No Email Provided";
+  document.getElementById('modalUserKey').innerText = user.userId || user.mobile || "N/A";
+  document.getElementById('modalUserDate').innerText = user.regDate || "N/A";
   document.getElementById('userInfoModal').classList.add('active');
   toggleAppMenu();
 };
@@ -340,7 +391,7 @@ window.closeUserInfoModal = function() {
 };
 
 window.showDeveloperInfo = function() {
-  alert("Kaushal Mi Player v2.0\nDeveloped by Computer Skills by Kaushalji\nPowered by API & Local Storage.");
+  alert("Kaushal Mi Player v2.5\nDeveloped by Computer Skills by Kaushalji\nPowered by Local Storage & API Integration.");
   toggleAppMenu();
 };
 
