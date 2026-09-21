@@ -3,12 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kaushal Mi Player - Advanced Hub</title>
+<title>Kaushal Mi Player - File Upload Hub</title>
 <style>
 :root{--bg-color:#f0f2f5;--header-bg:#1e293b;--card-bg:#ffffff;--text-color:#334155;--card-text:#333333;--input-border:#cbd5e1;--primary-color:#2563eb;--title-color:#38bdf8;}
 body.dark-theme{--bg-color:#0f172a;--header-bg:#1e293b;--card-bg:#1e293b;--text-color:#f8fafc;--card-text:#f1f5f9;--input-border:#475569;--title-color:#38bdf8;}
 *{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;}
-
 body{
   background: linear-gradient(rgba(15, 23, 42, 0.85), rgba(15, 23, 42, 0.85)), url('kaushalji.jpg');
   background-size: cover;
@@ -19,23 +18,19 @@ body{
   min-height: 100vh;
   padding-bottom: 50px;
 }
-
 header{background-color:var(--header-bg);color:white;display:flex;justify-content:space-between;align-items:center;padding:12px 20px;box-shadow:0 2px 10px rgba(0,0,0,0.15);position:relative;z-index:100;}
 .header-title{font-size:20px;font-weight:bold;color:var(--title-color);}
 .header-right{display:flex;align-items:center;gap:15px;}
 .icon-btn{background:none;border:none;color:white;font-size:22px;cursor:pointer;padding:4px;transition:0.2s;}
 .icon-btn:hover{color:var(--title-color);}
-
 .side-panel{position:fixed;top:0;right:-320px;width:300px;height:100%;background:var(--card-bg);color:var(--card-text);box-shadow:-5px 0 25px rgba(0,0,0,0.3);z-index:1000;transition:right 0.3s ease;padding:20px;overflow-y:auto;}
 .side-panel.open{right:0;}
 .panel-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;border-bottom:1px solid var(--input-border);padding-bottom:10px;}
 .panel-header h3{color:var(--primary-color);}
 .close-panel{background:none;border:none;font-size:22px;cursor:pointer;color:inherit;}
-
 .category-grid{display:flex;flex-direction:column;gap:12px;}
 .category-card{background:rgba(0,0,0,0.04);padding:14px;border-radius:8px;cursor:pointer;border:1px solid var(--input-border);font-weight:bold;transition:0.2s;display:flex;justify-content:space-between;align-items:center;}
 .category-card:hover{background:var(--primary-color);color:white;border-color:var(--primary-color);}
-
 .nav-tabs{display:flex;justify-content:center;background:var(--header-bg);border-top:1px solid rgba(255,255,255,0.1);}
 .nav-tabs button{background:none;border:none;color:#94a3b8;padding:14px 20px;font-size:15px;font-weight:bold;cursor:pointer;transition:0.3s;}
 .nav-tabs button.active,.nav-tabs button:hover{color:white;border-bottom:3px solid var(--title-color);}
@@ -44,14 +39,11 @@ header{background-color:var(--header-bg);color:white;display:flex;justify-conten
 .form-container{background:var(--card-bg);color:var(--card-text);padding:25px 30px;border-radius:10px;box-shadow:0 4px 20px rgba(0,0,0,0.3);max-width:500px;margin:0 auto;}
 .form-group{margin-bottom:15px;}
 .form-group label{display:block;margin-bottom:6px;font-size:14px;font-weight:600;}
-.form-group input,.form-group select{width:100%;padding:10px;border:1px solid var(--input-border);border-radius:6px;font-size:14px;background:transparent;color:inherit;}
+.form-group input, .form-group select{width:100%;padding:10px;border:1px solid var(--input-border);border-radius:6px;font-size:14px;background:transparent;color:inherit;}
 .submit-btn{width:100%;padding:12px;background-color:var(--primary-color);color:white;border:none;border-radius:6px;font-size:16px;font-weight:bold;cursor:pointer;margin-top:10px;display:flex;justify-content:center;align-items:center;gap:8px;}
 .submit-btn:hover{background-color:#1d4ed8;}
-
 .media-view-box{background:var(--card-bg);color:var(--card-text);padding:20px;border-radius:10px;box-shadow:0 4px 15px rgba(0,0,0,0.3);margin-top:20px;}
 .media-item{padding:12px;border-bottom:1px solid var(--input-border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;}
-
-/* Advanced Player Modal */
 .player-modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:9999;justify-content:center;align-items:center;flex-direction:column;padding:20px;}
 .player-modal.active{display:flex;}
 .player-box{background:var(--card-bg);color:var(--card-text);width:100%;max-width:650px;border-radius:12px;padding:20px;box-shadow:0 10px 30px rgba(0,0,0,0.5);text-align:center;position:relative;}
@@ -60,11 +52,8 @@ header{background-color:var(--header-bg);color:white;display:flex;justify-conten
 .player-controls{display:flex;justify-content:center;align-items:center;gap:12px;flex-wrap:wrap;margin-top:15px;}
 .ctrl-btn{background:var(--primary-color);color:white;border:none;padding:10px 15px;border-radius:6px;font-weight:bold;cursor:pointer;transition:0.2s;}
 .ctrl-btn:hover{background:#1d4ed8;}
-
-/* Spinner Loader */
 .spinner{width:18px;height:18px;border:3px solid rgba(255,255,255,0.3);border-radius:50%;border-top-color:#fff;animation:spin 0.8s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg);}}
-
 .modal-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:9999;justify-content:center;align-items:center;}
 .modal-overlay.active{display:flex;}
 .modal-box{background:var(--card-bg);color:var(--card-text);padding:25px;border-radius:10px;max-width:450px;width:90%;text-align:center;box-shadow:0 4px 25px rgba(0,0,0,0.4);position:relative;max-height:90vh;overflow-y:auto;}
@@ -89,7 +78,6 @@ header{background-color:var(--header-bg);color:white;display:flex;justify-conten
 </div>
 
 <div class="container">
-  
   <div id="authSection">
     <div class="form-container">
       <h3 id="authTitle" style="margin-bottom:15px;color:var(--primary-color);text-align:center;">User Registration</h3>
@@ -121,13 +109,12 @@ header{background-color:var(--header-bg);color:white;display:flex;justify-conten
   <div id="playerSection" class="hidden">
     <h2 class="section-title" id="welcomeUserTitle">Mi Player Media Hub</h2>
     
-    <!-- Add Local Storage Media Form -->
     <div class="form-container" style="max-width:100%;margin-bottom:20px;">
-      <h4 style="color:var(--primary-color);margin-bottom:12px;">➕ Add New Media to Local Storage</h4>
+      <h4 style="color:var(--primary-color);margin-bottom:12px;">➕ Add Media from Device / Local Storage</h4>
       <form id="addMediaForm" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;align-items:end;">
         <div class="form-group" style="margin:0;">
           <label>Category</label>
-          <select id="mediaCategorySelect">
+          <select id="mediaCategorySelect" onchange="updateFileAcceptType()">
             <option value="videos">Video</option>
             <option value="audios">Audio</option>
             <option value="pdfs">PDF / Document</option>
@@ -139,10 +126,10 @@ header{background-color:var(--header-bg);color:white;display:flex;justify-conten
           <input type="text" id="mediaTitleInput" placeholder="Enter title" required>
         </div>
         <div class="form-group" style="margin:0;">
-          <label>File / URL</label>
-          <input type="text" id="mediaUrlInput" placeholder="Paste URL or select file" required>
+          <label>Select File from Device</label>
+          <input type="file" id="mediaFileInput" accept="video/*" required>
         </div>
-        <button type="submit" class="submit-btn" style="margin:0;height:42px;">Save Media</button>
+        <button type="submit" class="submit-btn" id="saveMediaBtn" style="margin:0;height:42px;">Save to Storage</button>
       </form>
     </div>
 
@@ -156,28 +143,18 @@ header{background-color:var(--header-bg);color:white;display:flex;justify-conten
       </div>
     </div>
   </div>
-
 </div>
 
-<!-- Advanced Media Player Modal -->
 <div class="player-modal" id="advancedPlayerModal">
   <div class="player-box">
     <button class="close-panel" onclick="closeAdvancedPlayer()" style="position:absolute;top:12px;right:15px;">&times;</button>
     <h3 id="playerModalTitle" style="color:var(--primary-color);margin-bottom:12px;">Media Player</h3>
-    
-    <div class="player-display-area" id="playerDisplayArea">
-      <!-- Dynamic Player Content inserted via JS -->
-    </div>
-
+    <div class="player-display-area" id="playerDisplayArea"></div>
     <p id="nowPlayingTitle" style="font-weight:bold;font-size:15px;margin-bottom:10px;"></p>
-
-    <div class="player-controls" id="playerControlsContainer">
-      <!-- Buttons injected dynamically -->
-    </div>
+    <div class="player-controls" id="playerControlsContainer"></div>
   </div>
 </div>
 
-<!-- User Info Modal -->
 <div class="modal-overlay" id="userInfoModal">
   <div class="modal-box">
     <button class="close-panel" onclick="closeUserInfoModal()" style="position:absolute;top:10px;right:15px;">&times;</button>
@@ -191,7 +168,6 @@ header{background-color:var(--header-bg);color:white;display:flex;justify-conten
   </div>
 </div>
 
-<!-- 3 Dots Menu -->
 <div class="side-panel" id="mediaPanel">
   <div class="panel-header">
     <h3>Media Categories</h3>
@@ -205,7 +181,6 @@ header{background-color:var(--header-bg);color:white;display:flex;justify-conten
   </div>
 </div>
 
-<!-- 3 Arrows Menu -->
 <div class="side-panel" id="appMenuPanel">
   <div class="panel-header">
     <h3>App Tools & Info</h3>
@@ -267,13 +242,11 @@ window.switchAuthMode = function(e) {
   document.getElementById('nameGroup').style.display = isLoginMode ? "none" : "block";
   document.getElementById('imageGroup').style.display = isLoginMode ? "none" : "block";
   document.getElementById('authImgFile').required = !isLoginMode;
-  
   document.getElementById('toggleAuthModeText').innerHTML = isLoginMode ? 
     `Don't have an account? <a href="#" onclick="switchAuthMode(event)" style="color:var(--title-color);">Register here</a>` :
     `Already registered? <a href="#" onclick="switchAuthMode(event)" style="color:var(--title-color);">Login here</a>`;
 };
 
-// Auth Form Handler with Spinner Loader
 document.getElementById('authForm').addEventListener('submit', async function(e) {
   e.preventDefault();
   const submitBtn = document.getElementById('authSubmitBtn');
@@ -335,24 +308,48 @@ document.getElementById('authForm').addEventListener('submit', async function(e)
   submitBtn.innerHTML = `<span>${isLoginMode ? "Login" : "Register Now"}</span>`;
 });
 
-// Add Local Storage Media
-document.getElementById('addMediaForm').addEventListener('submit', function(e) {
+window.updateFileAcceptType = function() {
+  const cat = document.getElementById('mediaCategorySelect').value;
+  const fileInput = document.getElementById('mediaFileInput');
+  if(cat === 'videos') fileInput.accept = "video/*";
+  else if(cat === 'audios') fileInput.accept = "audio/*";
+  else if(cat === 'pdfs') fileInput.accept = "application/pdf";
+  else if(cat === 'images') fileInput.accept = "image/*";
+};
+
+document.getElementById('addMediaForm').addEventListener('submit', async function(e) {
   e.preventDefault();
   const cat = document.getElementById('mediaCategorySelect').value;
   const title = document.getElementById('mediaTitleInput').value.trim();
-  const url = document.getElementById('mediaUrlInput').value.trim();
+  const fileInput = document.getElementById('mediaFileInput');
+  const saveBtn = document.getElementById('saveMediaBtn');
 
-  let localItems = JSON.parse(localStorage.getItem('media_' + cat) || '[]');
-  localItems.push({ title, url, source: 'Local Storage' });
-  localStorage.setItem('media_' + cat, JSON.stringify(localItems));
+  if(!fileInput.files.length) {
+    alert("Kripya ek file select karein!");
+    return;
+  }
 
-  alert("Media added successfully!");
-  document.getElementById('mediaTitleInput').value = '';
-  document.getElementById('mediaUrlInput').value = '';
-  loadMediaCategory(cat);
+  const file = fileInput.files[0];
+  saveBtn.disabled = true;
+  saveBtn.innerHTML = `<div class="spinner"></div> Saving...`;
+
+  const reader = new FileReader();
+  reader.onload = function(event) {
+    const fileBase64 = event.target.result;
+    let localItems = JSON.parse(localStorage.getItem('media_' + cat) || '[]');
+    localItems.push({ title, url: fileBase64, source: 'Device Storage' });
+    localStorage.setItem('media_' + cat, JSON.stringify(localItems));
+
+    alert("Media successfully added from device storage!");
+    document.getElementById('mediaTitleInput').value = '';
+    fileInput.value = '';
+    saveBtn.disabled = false;
+    saveBtn.innerHTML = `Save to Storage`;
+    loadMediaCategory(cat);
+  };
+  reader.readAsDataURL(file);
 });
 
-// Load Media Categories (Local Storage + Admin DB Sync)
 window.loadMediaCategory = async function(category) {
   currentActiveCategory = category;
   toggleMediaPanel();
@@ -363,7 +360,6 @@ window.loadMediaCategory = async function(category) {
   let localItems = JSON.parse(localStorage.getItem('media_' + category) || '[]');
   let adminItems = [];
 
-  // Fetch from Admin Database if available
   try {
     let dbPath = category === 'videos' ? 'course_videos' : (category === 'pdfs' ? 'course_pdfs' : '');
     if(dbPath) {
@@ -380,7 +376,7 @@ window.loadMediaCategory = async function(category) {
   currentMediaList = [...localItems, ...adminItems];
 
   if(currentMediaList.length === 0) {
-    listEl.innerHTML = `<p style="text-align:center;padding:15px;opacity:0.7;">No items found. Add media using the form above or via Admin panel.</p>`;
+    listEl.innerHTML = `<p style="text-align:center;padding:15px;opacity:0.7;">No items found. Upload files using the form above.</p>`;
     document.getElementById('launchPlayerBtn').style.display = 'none';
     return;
   }
@@ -402,7 +398,6 @@ window.loadMediaCategory = async function(category) {
   });
 };
 
-// Advanced Player Logic
 window.openAdvancedPlayer = function() {
   if(currentActiveCategory === 'pdfs') {
     if(currentMediaList.length > 0) {
@@ -420,8 +415,7 @@ window.openAdvancedPlayer = function() {
 
 window.closeAdvancedPlayer = function() {
   document.getElementById('advancedPlayerModal').classList.remove('active');
-  const disp = document.getElementById('playerDisplayArea');
-  disp.innerHTML = '';
+  document.getElementById('playerDisplayArea').innerHTML = '';
 };
 
 function renderPlayerItem() {
@@ -511,7 +505,7 @@ window.closeUserInfoModal = function() {
 };
 
 window.showDeveloperInfo = function() {
-  alert("Kaushal Mi Player v3.0\nDeveloped by Computer Skills by Kaushalji");
+  alert("Kaushal Mi Player v3.2\nDeveloped by Computer Skills by Kaushalji");
   toggleAppMenu();
 };
 
