@@ -8,7 +8,18 @@
 :root{--bg-color:#f0f2f5;--header-bg:#1e293b;--card-bg:#ffffff;--text-color:#334155;--card-text:#333333;--input-border:#cbd5e1;--primary-color:#2563eb;--title-color:#38bdf8;}
 body.dark-theme{--bg-color:#0f172a;--header-bg:#1e293b;--card-bg:#1e293b;--text-color:#f8fafc;--card-text:#f1f5f9;--input-border:#475569;--title-color:#38bdf8;}
 *{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;}
-body{background-color:var(--bg-color);color:var(--text-color);transition:background 0.3s;padding-bottom:50px;}
+
+/* Background Image: kaushalji.jpg */
+body{
+  background: linear-gradient(rgba(15, 23, 42, 0.85), rgba(15, 23, 42, 0.85)), url('kaushalji.jpg');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  color: var(--text-color);
+  transition: background 0.3s;
+  min-height: 100vh;
+  padding-bottom: 50px;
+}
 
 /* Header Customizations */
 header{background-color:var(--header-bg);color:white;display:flex;justify-content:space-between;align-items:center;padding:12px 20px;box-shadow:0 2px 10px rgba(0,0,0,0.15);position:relative;z-index:100;}
@@ -17,32 +28,36 @@ header{background-color:var(--header-bg);color:white;display:flex;justify-conten
 .icon-btn{background:none;border:none;color:white;font-size:22px;cursor:pointer;padding:4px;transition:0.2s;}
 .icon-btn:hover{color:var(--title-color);}
 
-/* Slide Panels */
+/* Slide Panels & Modals */
 .side-panel{position:fixed;top:0;right:-320px;width:300px;height:100%;background:var(--card-bg);color:var(--card-text);box-shadow:-5px 0 25px rgba(0,0,0,0.3);z-index:1000;transition:right 0.3s ease;padding:20px;overflow-y:auto;}
 .side-panel.open{right:0;}
 .panel-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;border-bottom:1px solid var(--input-border);padding-bottom:10px;}
 .panel-header h3{color:var(--primary-color);}
 .close-panel{background:none;border:none;font-size:22px;cursor:pointer;color:inherit;}
 
-/* Category Boxes in Media Panel */
 .category-grid{display:flex;flex-direction:column;gap:12px;}
 .category-card{background:rgba(0,0,0,0.04);padding:14px;border-radius:8px;cursor:pointer;border:1px solid var(--input-border);font-weight:bold;transition:0.2s;display:flex;justify-content:space-between;align-items:center;}
 .category-card:hover{background:var(--primary-color);color:white;border-color:var(--primary-color);}
 
-/* General Layout Styles */
 .nav-tabs{display:flex;justify-content:center;background:var(--header-bg);border-top:1px solid rgba(255,255,255,0.1);}
 .nav-tabs button{background:none;border:none;color:#94a3b8;padding:14px 20px;font-size:15px;font-weight:bold;cursor:pointer;transition:0.3s;}
 .nav-tabs button.active,.nav-tabs button:hover{color:white;border-bottom:3px solid var(--title-color);}
 .container{max-width:1100px;margin:30px auto;padding:0 20px;}
-.section-title{text-align:center;margin-bottom:25px;font-size:24px;color:var(--text-color);}
-.form-container{background:var(--card-bg);color:var(--card-text);padding:25px 30px;border-radius:10px;box-shadow:0 4px 20px rgba(0,0,0,0.08);max-width:500px;margin:0 auto;}
+.section-title{text-align:center;margin-bottom:25px;font-size:24px;color:#fff;}
+.form-container{background:var(--card-bg);color:var(--card-text);padding:25px 30px;border-radius:10px;box-shadow:0 4px 20px rgba(0,0,0,0.3);max-width:500px;margin:0 auto;}
 .form-group{margin-bottom:15px;}
 .form-group label{display:block;margin-bottom:6px;font-size:14px;font-weight:600;}
-.form-group input,.form-group select{width:100%;padding:10px;border:1px solid var(--input-border);border-radius:6px;font-size:14px;background:transparent;color:inherit;}
+.form-group input{width:100%;padding:10px;border:1px solid var(--input-border);border-radius:6px;font-size:14px;background:transparent;color:inherit;}
 .submit-btn{width:100%;padding:12px;background-color:var(--primary-color);color:white;border:none;border-radius:6px;font-size:16px;font-weight:bold;cursor:pointer;margin-top:10px;}
 .submit-btn:hover{background-color:#1d4ed8;}
-.media-view-box{background:var(--card-bg);padding:20px;border-radius:10px;box-shadow:0 4px 15px rgba(0,0,0,0.05);margin-top:20px;}
+.media-view-box{background:var(--card-bg);color:var(--card-text);padding:20px;border-radius:10px;box-shadow:0 4px 15px rgba(0,0,0,0.3);margin-top:20px;}
 .media-item{padding:10px;border-bottom:1px solid var(--input-border);display:flex;justify-content:space-between;align-items:center;}
+
+/* Modal Overlay */
+.modal-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:9999;justify-content:center;align-items:center;}
+.modal-overlay.active{display:flex;}
+.modal-box{background:var(--card-bg);color:var(--card-text);padding:25px;border-radius:10px;max-width:400px;width:90%;text-align:center;box-shadow:0 4px 25px rgba(0,0,0,0.4);position:relative;}
+.user-profile-img{width:90px;height:90px;border-radius:50%;object-fit:cover;border:3px solid var(--primary-color);margin-bottom:15px;}
 .hidden{display:none !important;}
 </style>
 </head>
@@ -66,7 +81,7 @@ header{background-color:var(--header-bg);color:white;display:flex;justify-conten
 
 <div class="container">
   
-  <!-- Auth Section (Login & Registration) -->
+  <!-- Auth Section (Email Login & Registration) -->
   <div id="authSection">
     <div class="form-container">
       <h3 id="authTitle" style="margin-bottom:15px;color:var(--primary-color);text-align:center;">User Registration</h3>
@@ -76,17 +91,21 @@ header{background-color:var(--header-bg);color:white;display:flex;justify-conten
           <input type="text" id="authName" placeholder="Enter your name">
         </div>
         <div class="form-group">
-          <label>Mobile Number / Username *</label>
-          <input type="tel" id="authMobile" placeholder="10 Digit Mobile Number" required>
+          <label>Email ID *</label>
+          <input type="email" id="authEmail" placeholder="Enter email address" required>
         </div>
         <div class="form-group">
           <label>Password *</label>
           <input type="password" id="authPass" placeholder="Enter password" required>
         </div>
+        <div class="form-group" id="imageGroup">
+          <label>Profile Image *</label>
+          <input type="file" id="authImgFile" accept="image/*" required>
+        </div>
         <button type="submit" id="authSubmitBtn" class="submit-btn">Register Now</button>
       </form>
       <p style="text-align:center;margin-top:15px;font-size:14px;">
-        <span id="toggleAuthModeText">Already registered? <a href="#" onclick="switchAuthMode(event)" style="color:var(--primary-color);">Login here</a></span>
+        <span id="toggleAuthModeText">Already registered? <a href="#" onclick="switchAuthMode(event)" style="color:var(--title-color);">Login here</a></span>
       </p>
     </div>
   </div>
@@ -102,6 +121,18 @@ header{background-color:var(--header-bg);color:white;display:flex;justify-conten
     </div>
   </div>
 
+</div>
+
+<!-- User Info Modal -->
+<div class="modal-overlay" id="userInfoModal">
+  <div class="modal-box">
+    <button class="close-panel" onclick="closeUserInfoModal()" style="position:absolute;top:10px;right:15px;">&times;</button>
+    <h3 style="margin-bottom:15px;color:var(--primary-color);">User Profile Info</h3>
+    <img id="modalUserPic" src="" class="user-profile-img" alt="Profile Image">
+    <h4 id="modalUserName" style="margin-bottom:5px;"></h4>
+    <p id="modalUserEmail" style="opacity:0.8;font-size:14px;margin-bottom:15px;"></p>
+    <button class="submit-btn" onclick="closeUserInfoModal()">Close</button>
+  </div>
 </div>
 
 <!-- Right Slide Panel: 4 Media Categories (3 Dots Menu) -->
@@ -126,7 +157,7 @@ header{background-color:var(--header-bg);color:white;display:flex;justify-conten
   </div>
   <div class="category-grid">
     <div class="category-card" onclick="toggleTheme()"><span>🌓 Toggle Dark/Light Mode</span></div>
-    <div class="category-card" onclick="showUserInfo()"><span>👤 User Info</span></div>
+    <div class="category-card" onclick="showUserInfoModal()"><span>👤 User Info</span></div>
     <div class="category-card" onclick="showDeveloperInfo()"><span>💻 Developer Info</span></div>
     <div class="category-card" onclick="logoutUser()" style="background:#fee2e2;color:#991b1b;border-color:#fca5a5;"><span>🚪 Logout</span></div>
   </div>
@@ -141,6 +172,11 @@ const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
 let isLoginMode = false;
+
+// Helper to sanitize email for Firebase keys (dots are not allowed in keys)
+function sanitizeEmail(email) {
+  return email.toLowerCase().replace(/[\.#\$\/\[\]]/g, "_");
+}
 
 // Sample API & Local Storage Hybrid Media Data
 const sampleMediaAPI = {
@@ -187,21 +223,25 @@ window.switchAuthMode = function(e) {
   document.getElementById('authTitle').innerText = isLoginMode ? "User Login" : "User Registration";
   document.getElementById('authSubmitBtn').innerText = isLoginMode ? "Login" : "Register Now";
   document.getElementById('nameGroup').style.display = isLoginMode ? "none" : "block";
+  document.getElementById('imageGroup').style.display = isLoginMode ? "none" : "block";
+  document.getElementById('authImgFile').required = !isLoginMode;
+  
   document.getElementById('toggleAuthModeText').innerHTML = isLoginMode ? 
-    `Don't have an account? <a href="#" onclick="switchAuthMode(event)" style="color:var(--primary-color);">Register here</a>` :
-    `Already registered? <a href="#" onclick="switchAuthMode(event)" style="color:var(--primary-color);">Login here</a>`;
+    `Don't have an account? <a href="#" onclick="switchAuthMode(event)" style="color:var(--title-color);">Register here</a>` :
+    `Already registered? <a href="#" onclick="switchAuthMode(event)" style="color:var(--title-color);">Login here</a>`;
 };
 
 // Handle Registration / Login Form Submit
 document.getElementById('authForm').addEventListener('submit', async function(e) {
   e.preventDefault();
-  const mobile = document.getElementById('authMobile').value.trim();
+  const email = document.getElementById('authEmail').value.trim().toLowerCase();
   const pass = document.getElementById('authPass').value.trim();
   const name = document.getElementById('authName').value.trim() || "User";
+  const emailKey = sanitizeEmail(email);
 
   if(isLoginMode) {
-    // Login check via LocalStorage & API/Firebase
-    let savedUser = localStorage.getItem('user_' + mobile);
+    // Login check via LocalStorage first, then Firebase API
+    let savedUser = localStorage.getItem('user_' + emailKey);
     if(savedUser) {
       let userData = JSON.parse(savedUser);
       if(userData.pass === pass) {
@@ -212,27 +252,38 @@ document.getElementById('authForm').addEventListener('submit', async function(e)
       }
     }
     try {
-      const snap = await get(child(ref(db), 'mi_users/' + mobile));
+      const snap = await get(child(ref(db), 'mi_users/' + emailKey));
       if(snap.exists()) {
         let userData = snap.val();
         if(userData.pass === pass) {
+          localStorage.setItem('user_' + emailKey, JSON.stringify(userData));
           localStorage.setItem('miPlayerUser', JSON.stringify(userData));
           alert("Login successful from API/Cloud!");
           switchTab('player');
           return;
         }
       }
-      alert("Galat Mobile Number ya Password!");
+      alert("Galat Email ID ya Password!");
     } catch(err) {
       alert("Login error occurred.");
     }
   } else {
-    // Registration
-    let userData = { name, mobile, pass };
-    localStorage.setItem('user_' + mobile, JSON.stringify(userData));
+    // Registration with Image
+    const imgFile = document.getElementById('authImgFile').files[0];
+    let imageBase64 = "https://via.placeholder.com/150";
+    if(imgFile) {
+      imageBase64 = await new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = (ev) => resolve(ev.target.result);
+        reader.readAsDataURL(imgFile);
+      });
+    }
+
+    let userData = { name, email, pass, pic: imageBase64 };
+    localStorage.setItem('user_' + emailKey, JSON.stringify(userData));
     localStorage.setItem('miPlayerUser', JSON.stringify(userData));
     try {
-      await set(ref(db, 'mi_users/' + mobile), userData);
+      await set(ref(db, 'mi_users/' + emailKey), userData);
     } catch(err) { console.log("Cloud sync skipped."); }
     alert("Registration & Login successful!");
     switchTab('player');
@@ -241,12 +292,11 @@ document.getElementById('authForm').addEventListener('submit', async function(e)
 
 // Load Media Categories from API / Local Storage
 window.loadMediaCategory = function(category) {
-  toggleMediaPanel(); // Close panel after selection
+  toggleMediaPanel();
   document.getElementById('currentCategoryTitle').innerText = `${category.toUpperCase()} Collection (API & Local Storage)`;
   const listEl = document.getElementById('mediaContentList');
   listEl.innerHTML = "";
 
-  // Combine local storage custom media items + API sample items
   let localItems = JSON.parse(localStorage.getItem('media_' + category) || '[]');
   let apiItems = sampleMediaAPI[category] || [];
   let combined = [...localItems, ...apiItems];
@@ -263,7 +313,7 @@ window.loadMediaCategory = function(category) {
     if(category === 'videos') previewHTML = `<video width="120" controls src="${item.url}" style="border-radius:4px;"></video>`;
     else if(category === 'audios') previewHTML = `<audio controls src="${item.url}" style="height:35px;width:180px;"></audio>`;
     else if(category === 'images') previewHTML = `<img src="${item.url}" width="60" style="border-radius:4px;">`;
-    else previewHTML = `<a href="${item.url}" target="_blank" style="color:var(--primary-color);font-weight:bold;">View PDF</a>`;
+    else previewHTML = `<a href="${item.url}" target="_blank" style="color:var(--title-color);font-weight:bold;">View PDF</a>`;
 
     div.innerHTML = `<div><strong>${item.title}</strong><br><small style="opacity:0.7;">Source: ${item.source || 'Local'}</small></div><div>${previewHTML}</div>`;
     listEl.appendChild(div);
@@ -276,10 +326,17 @@ window.toggleTheme = function() {
   toggleAppMenu();
 };
 
-window.showUserInfo = function() {
+window.showUserInfoModal = function() {
   let user = JSON.parse(localStorage.getItem('miPlayerUser') || '{}');
-  alert(`User Info:\nName: ${user.name || 'Guest'}\nMobile: ${user.mobile || 'N/A'}`);
+  document.getElementById('modalUserPic').src = user.pic || "https://via.placeholder.com/150";
+  document.getElementById('modalUserName').innerText = user.name || "Guest User";
+  document.getElementById('modalUserEmail').innerText = user.email || "No Email Provided";
+  document.getElementById('userInfoModal').classList.add('active');
   toggleAppMenu();
+};
+
+window.closeUserInfoModal = function() {
+  document.getElementById('userInfoModal').classList.remove('active');
 };
 
 window.showDeveloperInfo = function() {
