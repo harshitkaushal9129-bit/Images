@@ -300,7 +300,7 @@ document.getElementById('authForm').addEventListener('submit', async function(e)
   submitBtn.innerHTML = `<span>${isLoginMode ? "Login" : "Register Now"}</span>`;
 });
 
-// Folder Upload & Auto-Categorization Logic
+// Folder Upload & Auto-Categorization Logic (Fixed Audio Support)
 document.getElementById('addMediaForm').addEventListener('submit', async function(e) {
   e.preventDefault();
   const folderInput = document.getElementById('mediaFolderInput');
@@ -323,8 +323,8 @@ document.getElementById('addMediaForm').addEventListener('submit', async functio
     const ext = fileName.split('.').pop().toLowerCase();
 
     let category = '';
-    if(['mp4', 'mkv', 'webm', 'avi', 'mov'].includes(ext)) category = 'videos';
-    else if(['mp3', 'wav', 'aac', 'm4a', 'ogg'].includes(ext)) category = 'audios';
+    if(['mp4', 'mkv', 'webm', 'avi', 'mov', '3gp'].includes(ext)) category = 'videos';
+    else if(['mp3', 'wav', 'aac', 'm4a', 'ogg', 'flac'].includes(ext)) category = 'audios';
     else if(['pdf'].includes(ext)) category = 'pdfs';
     else if(['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext)) category = 'images';
 
@@ -362,7 +362,7 @@ window.loadMediaCategory = async function(category) {
   let adminItems = [];
 
   try {
-    let dbPath = category === 'videos' ? 'course_videos' : (category === 'pdfs' ? 'course_pdfs' : '');
+    let dbPath = category === 'videos' ? 'course_videos' : (category === 'pdfs' ? 'course_pdfs' : (category === 'audios' ? 'course_audios' : ''));
     if(dbPath) {
       const snap = await get(child(ref(db), dbPath));
       if(snap.exists()) {
@@ -390,7 +390,7 @@ window.loadMediaCategory = async function(category) {
     div.className = "media-item";
     let previewHTML = "";
     if(category === 'videos') previewHTML = `<video width="120" src="${item.url}" style="border-radius:4px;"></video>`;
-    else if(category === 'audios') previewHTML = `<audio src="${item.url}" style="height:30px;width:150px;"></audio>`;
+    else if(category === 'audios') previewHTML = `<audio controls src="${item.url}" style="height:35px;width:180px;"></audio>`;
     else if(category === 'images') previewHTML = `<img src="${item.url}" width="60" style="border-radius:4px;">`;
     else previewHTML = `<a href="${item.url}" target="_blank" style="color:var(--title-color);font-weight:bold;">Open PDF in New Tab</a>`;
 
@@ -506,7 +506,7 @@ window.closeUserInfoModal = function() {
 };
 
 window.showDeveloperInfo = function() {
-  alert("Kaushal Mi Player v3.3\nDeveloped by Computer Skills by Kaushalji");
+  alert("Kaushal Mi Player v3.4\nDeveloped by Computer Skills by Kaushalji");
   toggleAppMenu();
 };
 
