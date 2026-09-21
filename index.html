@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kaushal Mi Player - online offline media player </title>
+<title>Kaushal Mi Player - File Upload Hub</title>
 <style>
 :root{--bg-color:#f0f2f5;--header-bg:#1e293b;--card-bg:#ffffff;--text-color:#334155;--card-text:#333333;--input-border:#cbd5e1;--primary-color:#2563eb;--title-color:#38bdf8;}
 body.dark-theme{--bg-color:#0f172a;--header-bg:#1e293b;--card-bg:#1e293b;--text-color:#f8fafc;--card-text:#f1f5f9;--input-border:#475569;--title-color:#38bdf8;}
@@ -110,26 +110,13 @@ header{background-color:var(--header-bg);color:white;display:flex;justify-conten
     <h2 class="section-title" id="welcomeUserTitle">Mi Player Media Hub</h2>
     
     <div class="form-container" style="max-width:100%;margin-bottom:20px;">
-      <h4 style="color:var(--primary-color);margin-bottom:12px;">➕ Add Media from Device / Local Storage</h4>
-      <form id="addMediaForm" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;align-items:end;">
+      <h4 style="color:var(--primary-color);margin-bottom:12px;">📁 Select Entire Folder from Device</h4>
+      <form id="addMediaForm" style="display:grid;grid-template-columns:1fr auto;gap:12px;align-items:end;">
         <div class="form-group" style="margin:0;">
-          <label>Category</label>
-          <select id="mediaCategorySelect" onchange="updateFileAcceptType()">
-            <option value="videos">Video</option>
-            <option value="audios">Audio</option>
-            <option value="pdfs">PDF / Document</option>
-            <option value="images">Image</option>
-          </select>
+          <label>Select Folder (Auto-detects Videos, Audios, Images & PDFs)</label>
+          <input type="file" id="mediaFolderInput" webkitdirectory directory multiple required>
         </div>
-        <div class="form-group" style="margin:0;">
-          <label>Media Title</label>
-          <input type="text" id="mediaTitleInput" placeholder="Enter title" required>
-        </div>
-        <div class="form-group" style="margin:0;">
-          <label>Select File from Device</label>
-          <input type="file" id="mediaFileInput" accept="video/*" required>
-        </div>
-        <button type="submit" class="submit-btn" id="saveMediaBtn" style="margin:0;height:42px;">Save to Storage</button>
+        <button type="submit" class="submit-btn" id="saveMediaBtn" style="margin:0;height:42px;width:180px;">Upload Folder</button>
       </form>
     </div>
 
@@ -313,46 +300,55 @@ document.getElementById('authForm').addEventListener('submit', async function(e)
   submitBtn.innerHTML = `<span>${isLoginMode ? "Login" : "Register Now"}</span>`;
 });
 
-window.updateFileAcceptType = function() {
-  const cat = document.getElementById('mediaCategorySelect').value;
-  const fileInput = document.getElementById('mediaFileInput');
-  if(cat === 'videos') fileInput.accept = "video/*";
-  else if(cat === 'audios') fileInput.accept = "audio/*";
-  else if(cat === 'pdfs') fileInput.accept = "application/pdf";
-  else if(cat === 'images') fileInput.accept = "image/*";
-};
-
+// Folder Upload & Auto-Categorization Logic
 document.getElementById('addMediaForm').addEventListener('submit', async function(e) {
   e.preventDefault();
-  const cat = document.getElementById('mediaCategorySelect').value;
-  const title = document.getElementById('mediaTitleInput').value.trim();
-  const fileInput = document.getElementById('mediaFileInput');
+  const folderInput = document.getElementById('mediaFolderInput');
   const saveBtn = document.getElementById('saveMediaBtn');
 
-  if(!fileInput.files.length) {
-    alert("Kripya ek file select karein!");
+  if(!folderInput.files.length) {
+    alert("Kripya ek folder select karein!");
     return;
   }
 
-  const file = fileInput.files[0];
+  const files = folderInput.files;
   saveBtn.disabled = true;
-  saveBtn.innerHTML = `<div class="spinner"></div> Saving...`;
+  saveBtn.innerHTML = `<div class="spinner"></div> Processing...`;
 
-  const reader = new FileReader();
-  reader.onload = function(event) {
-    const fileBase64 = event.target.result;
-    let localItems = JSON.parse(localStorage.getItem('media_' + cat) || '[]');
-    localItems.push({ title, url: fileBase64, source: 'Device Storage' });
-    localStorage.setItem('media_' + cat, JSON.stringify(localItems));
+  let addedCount = 0;
 
-    alert("Media successfully added from device storage!");
-    document.getElementById('mediaTitleInput').value = '';
-    fileInput.value = '';
-    saveBtn.disabled = false;
-    saveBtn.innerHTML = `Save to Storage`;
-    loadMediaCategory(cat);
-  };
-  reader.readAsDataURL(file);
+  for(let i = 0; i < files.length; i++) {
+    const file = files[i];
+    const fileName = file.name;
+    const ext = fileName.split('.').pop().toLowerCase();
+
+    let category = '';
+    if(['mp4', 'mkv', 'webm', 'avi', 'mov'].includes(ext)) category = 'videos';
+    else if(['mp3', 'wav', 'aac', 'm4a', 'ogg'].includes(ext)) category = 'audios';
+    else if(['pdf'].includes(ext)) category = 'pdfs';
+    else if(['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext)) category = 'images';
+
+    if(category) {
+      await new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          const fileBase64 = event.target.result;
+          let localItems = JSON.parse(localStorage.getItem('media_' + category) || '[]');
+          localItems.push({ title: fileName.substring(0, fileName.lastIndexOf('.')) || fileName, url: fileBase64, source: 'Folder Upload' });
+          localStorage.setItem('media_' + category, JSON.stringify(localItems));
+          addedCount++;
+          resolve();
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+  }
+
+  alert(`Folder successfully uploaded! Total ${addedCount} media files added to respective categories.`);
+  folderInput.value = '';
+  saveBtn.disabled = false;
+  saveBtn.innerHTML = `Upload Folder`;
+  loadMediaCategory(currentActiveCategory);
 });
 
 window.loadMediaCategory = async function(category) {
@@ -381,7 +377,7 @@ window.loadMediaCategory = async function(category) {
   currentMediaList = [...localItems, ...adminItems];
 
   if(currentMediaList.length === 0) {
-    listEl.innerHTML = `<p style="text-align:center;padding:15px;opacity:0.7;">No items found. Upload files using the form above.</p>`;
+    listEl.innerHTML = `<p style="text-align:center;padding:15px;opacity:0.7;">No items found. Upload folder using the form above.</p>`;
     document.getElementById('launchPlayerBtn').style.display = 'none';
     return;
   }
@@ -510,7 +506,7 @@ window.closeUserInfoModal = function() {
 };
 
 window.showDeveloperInfo = function() {
-  alert("Kaushal Mi Player v3.2\nDeveloped by Computer Skills by Kaushalji");
+  alert("Kaushal Mi Player v3.3\nDeveloped by Computer Skills by Kaushalji");
   toggleAppMenu();
 };
 
