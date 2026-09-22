@@ -194,6 +194,50 @@ let currentActiveCategory = 'videos';
 let currentMediaList = [];
 let currentIndex = 0;
 
+// IndexedDB Setup for Fast & Large Storage
+let dbInstance = null;
+function initIndexedDB() {
+  return new Promise((resolve, reject) => {
+    if (dbInstance) return resolve(dbInstance);
+    const request = indexedDB.open('KaushalMiPlayerDB', 1);
+    request.onerror = (e) => reject(e);
+    request.onsuccess = (e) => {
+      dbInstance = e.target.result;
+      resolve(dbInstance);
+    };
+    request.onupgradeneeded = (e) => {
+      const database = e.target.result;
+      ['videos', 'audios', 'pdfs', 'images'].forEach(cat => {
+        if (!database.objectStoreNames.contains(cat)) {
+          database.createObjectStore(cat, { keyPath: 'id', autoIncrement: true });
+        }
+      });
+    };
+  });
+}
+
+function saveToIndexedDB(category, item) {
+  return new Promise(async (resolve, reject) => {
+    const database = await initIndexedDB();
+    const transaction = database.transaction(category, 'readwrite');
+    const store = transaction.objectStore(category);
+    const request = store.add(item);
+    request.onsuccess = () => resolve();
+    request.onerror = (e) => reject(e);
+  });
+}
+
+function getFromIndexedDB(category) {
+  return new Promise(async (resolve, reject) => {
+    const database = await initIndexedDB();
+    const transaction = database.transaction(category, 'readonly');
+    const store = transaction.objectStore(category);
+    const request = store.getAll();
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = (e) => reject(e);
+  });
+}
+
 function sanitizeEmail(email) {
   return email ? email.toLowerCase().replace(/[\.#\$\/\[\]]/g, "_") : "";
 }
@@ -300,7 +344,7 @@ document.getElementById('authForm').addEventListener('submit', async function(e)
   submitBtn.innerHTML = `<span>${isLoginMode ? "Login" : "Register Now"}</span>`;
 });
 
-// Folder Upload & Auto-Categorization Logic (Fixed Audio Support)
+// Folder Upload & Auto-Categorization Logic using IndexedDB
 document.getElementById('addMediaForm').addEventListener('submit', async function(e) {
   e.preventDefault();
   const folderInput = document.getElementById('mediaFolderInput');
@@ -331,11 +375,13 @@ document.getElementById('addMediaForm').addEventListener('submit', async functio
     if(category) {
       await new Promise((resolve) => {
         const reader = new FileReader();
-        reader.onload = function(event) {
+        reader.onload = async function(event) {
           const fileBase64 = event.target.result;
-          let localItems = JSON.parse(localStorage.getItem('media_' + category) || '[]');
-          localItems.push({ title: fileName.substring(0, fileName.lastIndexOf('.')) || fileName, url: fileBase64, source: 'Folder Upload' });
-          localStorage.setItem('media_' + category, JSON.stringify(localItems));
+          await saveToIndexedDB(category, { 
+            title: fileName.substring(0, fileName.lastIndexOf('.')) || fileName, 
+            url: fileBase64, 
+            source: 'Folder Upload' 
+          });
           addedCount++;
           resolve();
         };
@@ -344,7 +390,7 @@ document.getElementById('addMediaForm').addEventListener('submit', async functio
     }
   }
 
-  alert(`Folder successfully uploaded! Total ${addedCount} media files added to respective categories.`);
+  alert(`Folder successfully uploaded! Total ${addedCount} media files added.`);
   folderInput.value = '';
   saveBtn.disabled = false;
   saveBtn.innerHTML = `Upload Folder`;
@@ -358,9 +404,16 @@ window.loadMediaCategory = async function(category) {
   const listEl = document.getElementById('mediaContentList');
   listEl.innerHTML = "<p style='text-align:center;'>Loading media...</p>";
 
-  let localItems = JSON.parse(localStorage.getItem('media_' + category) || '[]');
-  let adminItems = [];
+  // Fetch from IndexedDB (Super Fast)
+  let localItems = [];
+  try {
+    localItems = await getFromIndexedDB(category);
+  } catch(e) {
+    localItems = [];
+  }
 
+  // Fetch from Firebase Admin DB
+  let adminItems = [];
   try {
     let dbPath = category === 'videos' ? 'course_videos' : (category === 'pdfs' ? 'course_pdfs' : (category === 'audios' ? 'course_audios' : ''));
     if(dbPath) {
@@ -506,7 +559,7 @@ window.closeUserInfoModal = function() {
 };
 
 window.showDeveloperInfo = function() {
-  alert("Kaushal Mi Player v3.4\nDeveloped by Computer Skills by Kaushalji");
+  alert("Kaushal Mi Player v3.5\nDeveloped by Computer Skills by Kaushalji");
   toggleAppMenu();
 };
 
@@ -518,6 +571,7 @@ window.logoutUser = function() {
 };
 
 window.addEventListener('DOMContentLoaded', () => {
+  initIndexedDB().catch(err => console.log("IndexedDB Init Error:", err));
   if(localStorage.getItem('theme') === 'dark') document.body.classList.add('dark-theme');
   if(localStorage.getItem('miPlayerUser')) switchTab('player');
 });
