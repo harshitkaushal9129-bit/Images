@@ -44,13 +44,20 @@ header{background-color:var(--header-bg);color:white;display:flex;justify-conten
 .submit-btn:hover{background-color:#1d4ed8;}
 .media-view-box{background:var(--card-bg);color:var(--card-text);padding:20px;border-radius:10px;box-shadow:0 4px 15px rgba(0,0,0,0.3);margin-top:20px;}
 .media-item{padding:12px;border-bottom:1px solid var(--input-border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;}
+
+/* Dedicated Audio Player Floating Box / Div */
+.dedicated-audio-box{display:none;position:fixed;bottom:20px;right:20px;width:350px;background:var(--card-bg);color:var(--card-text);border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,0.4);z-index:9998;padding:15px;border:1px solid var(--input-border);text-align:center;}
+.dedicated-audio-box.active{display:block;}
+.open-audio-floating-btn{display:none;position:fixed;bottom:20px;right:20px;background:var(--primary-color);color:white;border:none;padding:12px 18px;border-radius:30px;font-weight:bold;cursor:pointer;box-shadow:0 4px 15px rgba(0,0,0,0.3);z-index:9997;}
+.open-audio-floating-btn.active{display:block;}
+
 .player-modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:9999;justify-content:center;align-items:center;flex-direction:column;padding:20px;}
 .player-modal.active{display:flex;}
 .player-box{background:var(--card-bg);color:var(--card-text);width:100%;max-width:650px;border-radius:12px;padding:20px;box-shadow:0 10px 30px rgba(0,0,0,0.5);text-align:center;position:relative;}
 .player-display-area{width:100%;min-height:250px;background:#000;border-radius:8px;display:flex;justify-content:center;align-items:center;overflow:hidden;margin-bottom:15px;position:relative;}
 .player-display-area video, .player-display-area img{max-width:100%;max-height:350px;object-fit:contain;}
-.player-controls{display:flex;justify-content:center;align-items:center;gap:12px;flex-wrap:wrap;margin-top:15px;}
-.ctrl-btn{background:var(--primary-color);color:white;border:none;padding:10px 15px;border-radius:6px;font-weight:bold;cursor:pointer;transition:0.2s;}
+.player-controls{display:flex;justify-content:center;align-items:center;gap:10px;flex-wrap:wrap;margin-top:15px;}
+.ctrl-btn{background:var(--primary-color);color:white;border:none;padding:8px 12px;border-radius:6px;font-weight:bold;cursor:pointer;font-size:13px;transition:0.2s;}
 .ctrl-btn:hover{background:#1d4ed8;}
 .spinner{width:18px;height:18px;border:3px solid rgba(255,255,255,0.3);border-radius:50%;border-top-color:#fff;animation:spin 0.8s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg);}}
@@ -132,6 +139,26 @@ header{background-color:var(--header-bg);color:white;display:flex;justify-conten
   </div>
 </div>
 
+<!-- Dedicated Audio Floating Box / Div -->
+<div class="dedicated-audio-box" id="dedicatedAudioBox">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;border-bottom:1px solid var(--input-border);padding-bottom:5px;">
+    <h4 style="color:var(--primary-color);font-size:15px;">🎵 Dedicated Audio Player</h4>
+    <button class="close-panel" onclick="closeDedicatedAudioBox()" style="font-size:18px;">&times;</button>
+  </div>
+  <p id="audioBoxTitle" style="font-weight:bold;font-size:13px;margin-bottom:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">No Audio Playing</p>
+  <audio id="floatingAudioEl" controls style="width:100%;height:35px;margin-bottom:10px;"></audio>
+  <div class="player-controls">
+    <button class="ctrl-btn" onclick="changeAudioIndex(-1)">⏮ Prev</button>
+    <button class="ctrl-btn" onclick="skipAudioTime(-10)">-10s</button>
+    <button class="ctrl-btn" onclick="togglePlayPauseAudioBox()">⏯ Play</button>
+    <button class="ctrl-btn" onclick="skipAudioTime(10)">+10s</button>
+    <button class="ctrl-btn" onclick="changeAudioIndex(1)">Next ⏭</button>
+  </div>
+</div>
+
+<button class="open-audio-floating-btn" id="openAudioFloatingBtn" onclick="openDedicatedAudioBox()">🎵 Open Audio Player</button>
+
+<!-- Video / Image Player Modal -->
 <div class="player-modal" id="advancedPlayerModal">
   <div class="player-box">
     <button class="close-panel" onclick="closeAdvancedPlayer()" style="position:absolute;top:12px;right:15px;">&times;</button>
@@ -193,8 +220,8 @@ let isLoginMode = false;
 let currentActiveCategory = 'videos';
 let currentMediaList = [];
 let currentIndex = 0;
+let audioIndex = 0;
 
-// IndexedDB Setup for Fast & Large Storage
 let dbInstance = null;
 function initIndexedDB() {
   return new Promise((resolve, reject) => {
@@ -344,7 +371,7 @@ document.getElementById('authForm').addEventListener('submit', async function(e)
   submitBtn.innerHTML = `<span>${isLoginMode ? "Login" : "Register Now"}</span>`;
 });
 
-// Folder Upload & Auto-Categorization Logic using IndexedDB
+// Crash-Free Folder Upload using Object URL & IndexedDB
 document.getElementById('addMediaForm').addEventListener('submit', async function(e) {
   e.preventDefault();
   const folderInput = document.getElementById('mediaFolderInput');
@@ -373,20 +400,13 @@ document.getElementById('addMediaForm').addEventListener('submit', async functio
     else if(['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext)) category = 'images';
 
     if(category) {
-      await new Promise((resolve) => {
-        const reader = new FileReader();
-        reader.onload = async function(event) {
-          const fileBase64 = event.target.result;
-          await saveToIndexedDB(category, { 
-            title: fileName.substring(0, fileName.lastIndexOf('.')) || fileName, 
-            url: fileBase64, 
-            source: 'Folder Upload' 
-          });
-          addedCount++;
-          resolve();
-        };
-        reader.readAsDataURL(file);
+      const fileUrl = URL.createObjectURL(file);
+      await saveToIndexedDB(category, { 
+        title: fileName.substring(0, fileName.lastIndexOf('.')) || fileName, 
+        url: fileUrl, 
+        source: 'Folder Upload' 
       });
+      addedCount++;
     }
   }
 
@@ -404,7 +424,6 @@ window.loadMediaCategory = async function(category) {
   const listEl = document.getElementById('mediaContentList');
   listEl.innerHTML = "<p style='text-align:center;'>Loading media...</p>";
 
-  // Fetch from IndexedDB (Super Fast)
   let localItems = [];
   try {
     localItems = await getFromIndexedDB(category);
@@ -412,7 +431,6 @@ window.loadMediaCategory = async function(category) {
     localItems = [];
   }
 
-  // Fetch from Firebase Admin DB
   let adminItems = [];
   try {
     let dbPath = category === 'videos' ? 'course_videos' : (category === 'pdfs' ? 'course_pdfs' : (category === 'audios' ? 'course_audios' : ''));
@@ -443,13 +461,21 @@ window.loadMediaCategory = async function(category) {
     div.className = "media-item";
     let previewHTML = "";
     if(category === 'videos') previewHTML = `<video width="120" src="${item.url}" style="border-radius:4px;"></video>`;
-    else if(category === 'audios') previewHTML = `<audio controls src="${item.url}" style="height:35px;width:180px;"></audio>`;
+    else if(category === 'audios') previewHTML = `<audio controls src="${item.url}" style="height:35px;width:180px;" onplay="launchAudioPlayerFromList(${index})"></audio>`;
     else if(category === 'images') previewHTML = `<img src="${item.url}" width="60" style="border-radius:4px;">`;
     else previewHTML = `<a href="${item.url}" target="_blank" style="color:var(--title-color);font-weight:bold;">Open PDF in New Tab</a>`;
 
     div.innerHTML = `<div><strong>${index+1}. ${item.title}</strong><br><small style="opacity:0.7;">Source: ${item.source}</small></div><div>${previewHTML}</div>`;
     listEl.appendChild(div);
   });
+
+  // Agar Audio category select ki gayi hai, toh floating audio player button show karein
+  if(category === 'audios' && currentMediaList.length > 0) {
+    document.getElementById('openAudioFloatingBtn').classList.add('active');
+  } else {
+    document.getElementById('openAudioFloatingBtn').classList.remove('active');
+    document.getElementById('dedicatedAudioBox').classList.remove('active');
+  }
 };
 
 window.openAdvancedPlayer = function() {
@@ -462,6 +488,11 @@ window.openAdvancedPlayer = function() {
     return;
   }
 
+  if(currentActiveCategory === 'audios') {
+    openDedicatedAudioBox();
+    return;
+  }
+
   currentIndex = 0;
   document.getElementById('advancedPlayerModal').classList.add('active');
   renderPlayerItem();
@@ -470,6 +501,59 @@ window.openAdvancedPlayer = function() {
 window.closeAdvancedPlayer = function() {
   document.getElementById('advancedPlayerModal').classList.remove('active');
   document.getElementById('playerDisplayArea').innerHTML = '';
+};
+
+// Dedicated Audio Player Controls Logic
+window.openDedicatedAudioBox = function() {
+  if(currentActiveCategory !== 'audios' || currentMediaList.length === 0) {
+    alert("Pehle Audios category select karein aur audio files upload karein!");
+    return;
+  }
+  document.getElementById('dedicatedAudioBox').classList.add('active');
+  document.getElementById('openAudioFloatingBtn').classList.remove('active');
+  loadAudioInFloatingPlayer(audioIndex);
+};
+
+window.closeDedicatedAudioBox = function() {
+  document.getElementById('dedicatedAudioBox').classList.remove('active');
+  if(currentActiveCategory === 'audios' && currentMediaList.length > 0) {
+    document.getElementById('openAudioFloatingBtn').classList.add('active');
+  }
+};
+
+window.launchAudioPlayerFromList = function(index) {
+  audioIndex = index;
+  openDedicatedAudioBox();
+};
+
+function loadAudioInFloatingPlayer(idx) {
+  if(currentMediaList.length === 0) return;
+  audioIndex = idx;
+  const item = currentMediaList[audioIndex];
+  document.getElementById('audioBoxTitle').innerText = `${audioIndex + 1}. ${item.title}`;
+  const audioEl = document.getElementById('floatingAudioEl');
+  audioEl.src = item.url;
+  audioEl.play().catch(e => {});
+}
+
+window.changeAudioIndex = function(dir) {
+  audioIndex += dir;
+  if(audioIndex < 0) audioIndex = currentMediaList.length - 1;
+  if(audioIndex >= currentMediaList.length) audioIndex = 0;
+  loadAudioInFloatingPlayer(audioIndex);
+};
+
+window.skipAudioTime = function(sec) {
+  const audioEl = document.getElementById('floatingAudioEl');
+  if(audioEl) audioEl.currentTime += sec;
+};
+
+window.togglePlayPauseAudioBox = function() {
+  const audioEl = document.getElementById('floatingAudioEl');
+  if(audioEl) {
+    if(audioEl.paused) audioEl.play();
+    else audioEl.pause();
+  }
 };
 
 function renderPlayerItem() {
@@ -490,15 +574,6 @@ function renderPlayerItem() {
       <button class="ctrl-btn" onclick="skipVideoTime(-10)">⏪ -10s</button>
       <button class="ctrl-btn" onclick="togglePlayPauseVideo()">⏯ Play/Pause</button>
       <button class="ctrl-btn" onclick="skipVideoTime(10)">+10s ⏩</button>
-      <button class="ctrl-btn" onclick="changeMediaIndex(1)">Next ⏭</button>
-    `;
-  } else if(currentActiveCategory === 'audios') {
-    disp.innerHTML = `<div style="padding:40px;text-align:center;"><audio id="activeAudioEl" src="${item.url}" controls autoplay style="width:100%;"></audio></div>`;
-    ctrl.innerHTML = `
-      <button class="ctrl-btn" onclick="changeMediaIndex(-1)">⏮ Previous</button>
-      <button class="ctrl-btn" onclick="skipAudioTime(-10)">⏪ -10s</button>
-      <button class="ctrl-btn" onclick="togglePlayPauseAudio()">⏯ Play/Pause</button>
-      <button class="ctrl-btn" onclick="skipAudioTime(10)">+10s ⏩</button>
       <button class="ctrl-btn" onclick="changeMediaIndex(1)">Next ⏭</button>
     `;
   } else if(currentActiveCategory === 'images') {
@@ -527,16 +602,6 @@ window.togglePlayPauseVideo = function() {
   if(v) { if(v.paused) v.play(); else v.pause(); }
 };
 
-window.skipAudioTime = function(sec) {
-  const a = document.getElementById('activeAudioEl');
-  if(a) a.currentTime += sec;
-};
-
-window.togglePlayPauseAudio = function() {
-  const a = document.getElementById('activeAudioEl');
-  if(a) { if(a.paused) a.play(); else a.pause(); }
-};
-
 window.toggleTheme = function() {
   document.body.classList.toggle('dark-theme');
   localStorage.setItem('theme', document.body.classList.contains('dark-theme') ? 'dark' : 'light');
@@ -559,7 +624,7 @@ window.closeUserInfoModal = function() {
 };
 
 window.showDeveloperInfo = function() {
-  alert("Kaushal Mi Player v3.5\nDeveloped by Computer Skills by Kaushalji");
+  alert("Kaushal Mi Player v3.6\nDeveloped by Computer Skills by Kaushalji");
   toggleAppMenu();
 };
 
