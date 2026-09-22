@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kaushal Mi Player - File Upload Hub</title>
+<title>Kaushal Mi Player - Ultimate Hub</title>
 <style>
 :root{--bg-color:#f0f2f5;--header-bg:#1e293b;--card-bg:#ffffff;--text-color:#334155;--card-text:#333333;--input-border:#cbd5e1;--primary-color:#2563eb;--title-color:#38bdf8;}
 body.dark-theme{--bg-color:#0f172a;--header-bg:#1e293b;--card-bg:#1e293b;--text-color:#f8fafc;--card-text:#f1f5f9;--input-border:#475569;--title-color:#38bdf8;}
 *{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;}
 body{
-  background: linear-gradient(rgba(15, 23, 42, 0.85), rgba(15, 23, 42, 0.85)), url('kaushal-institute.png');
+  background: linear-gradient(rgba(15, 23, 42, 0.85), rgba(15, 23, 42, 0.85)), url('kaushalji.jpg');
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
@@ -45,11 +45,15 @@ header{background-color:var(--header-bg);color:white;display:flex;justify-conten
 .media-view-box{background:var(--card-bg);color:var(--card-text);padding:20px;border-radius:10px;box-shadow:0 4px 15px rgba(0,0,0,0.3);margin-top:20px;}
 .media-item{padding:12px;border-bottom:1px solid var(--input-border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;}
 
-/* Dedicated Audio Player Floating Box / Div */
-.dedicated-audio-box{display:none;position:fixed;bottom:20px;right:20px;width:350px;background:var(--card-bg);color:var(--card-text);border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,0.4);z-index:9998;padding:15px;border:1px solid var(--input-border);text-align:center;}
-.dedicated-audio-box.active{display:block;}
-.open-audio-floating-btn{display:none;position:fixed;bottom:20px;right:20px;background:var(--primary-color);color:white;border:none;padding:12px 18px;border-radius:30px;font-weight:bold;cursor:pointer;box-shadow:0 4px 15px rgba(0,0,0,0.3);z-index:9997;}
-.open-audio-floating-btn.active{display:block;}
+/* Full Screen Advanced Audio Player Modal */
+.full-audio-modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);z-index:9999;justify-content:center;align-items:center;padding:20px;}
+.full-audio-modal.active{display:flex;}
+.full-audio-card{background:var(--card-bg);color:var(--card-text);width:100%;max-width:550px;border-radius:16px;padding:30px;box-shadow:0 15px 40px rgba(0,0,0,0.6);text-align:center;position:relative;border:1px solid var(--input-border);}
+.audio-profile-container{position:relative;width:120px;height:120px;margin:0 auto 15px auto;}
+.audio-user-avatar{width:120px;height:120px;border-radius:50%;object-fit:cover;border:4px solid var(--primary-color);box-shadow:0 5px 15px rgba(0,0,0,0.3);}
+.visualizer-canvas{width:100%;height:60px;background:#000;border-radius:8px;margin-bottom:15px;}
+.open-audio-modal-btn{display:none;position:fixed;bottom:25px;right:25px;background:var(--primary-color);color:white;border:none;padding:14px 22px;border-radius:35px;font-weight:bold;cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,0.4);z-index:9998;font-size:15px;align-items:center;gap:8px;}
+.open-audio-modal-btn.active{display:flex;}
 
 .player-modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:9999;justify-content:center;align-items:center;flex-direction:column;padding:20px;}
 .player-modal.active{display:flex;}
@@ -57,7 +61,7 @@ header{background-color:var(--header-bg);color:white;display:flex;justify-conten
 .player-display-area{width:100%;min-height:250px;background:#000;border-radius:8px;display:flex;justify-content:center;align-items:center;overflow:hidden;margin-bottom:15px;position:relative;}
 .player-display-area video, .player-display-area img{max-width:100%;max-height:350px;object-fit:contain;}
 .player-controls{display:flex;justify-content:center;align-items:center;gap:10px;flex-wrap:wrap;margin-top:15px;}
-.ctrl-btn{background:var(--primary-color);color:white;border:none;padding:8px 12px;border-radius:6px;font-weight:bold;cursor:pointer;font-size:13px;transition:0.2s;}
+.ctrl-btn{background:var(--primary-color);color:white;border:none;padding:8px 14px;border-radius:6px;font-weight:bold;cursor:pointer;font-size:13px;transition:0.2s;}
 .ctrl-btn:hover{background:#1d4ed8;}
 .spinner{width:18px;height:18px;border:3px solid rgba(255,255,255,0.3);border-radius:50%;border-top-color:#fff;animation:spin 0.8s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg);}}
@@ -130,7 +134,7 @@ header{background-color:var(--header-bg);color:white;display:flex;justify-conten
     <div class="media-view-box">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;">
         <h3 id="currentCategoryTitle" style="color:var(--primary-color);">Select a Category</h3>
-        <button class="ctrl-btn" onclick="openAdvancedPlayer()" id="launchPlayerBtn">🚀 Open in Advanced Player</button>
+        <button class="ctrl-btn" onclick="openAdvancedPlayer()" id="launchPlayerBtn">🚀 Open Advanced Player</button>
       </div>
       <div id="mediaContentList">
         <p style="text-align:center;opacity:0.7;padding:20px;">Right side ke 3 dots (⋮) par click karke category select karein.</p>
@@ -139,24 +143,34 @@ header{background-color:var(--header-bg);color:white;display:flex;justify-conten
   </div>
 </div>
 
-<!-- Dedicated Audio Floating Box / Div -->
-<div class="dedicated-audio-box" id="dedicatedAudioBox">
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;border-bottom:1px solid var(--input-border);padding-bottom:5px;">
-    <h4 style="color:var(--primary-color);font-size:15px;">🎵 Dedicated Audio Player</h4>
-    <button class="close-panel" onclick="closeDedicatedAudioBox()" style="font-size:18px;">&times;</button>
-  </div>
-  <p id="audioBoxTitle" style="font-weight:bold;font-size:13px;margin-bottom:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">No Audio Playing</p>
-  <audio id="floatingAudioEl" controls style="width:100%;height:35px;margin-bottom:10px;"></audio>
-  <div class="player-controls">
-    <button class="ctrl-btn" onclick="changeAudioIndex(-1)">⏮ Prev</button>
-    <button class="ctrl-btn" onclick="skipAudioTime(-10)">-10s</button>
-    <button class="ctrl-btn" onclick="togglePlayPauseAudioBox()">⏯ Play</button>
-    <button class="ctrl-btn" onclick="skipAudioTime(10)">+10s</button>
-    <button class="ctrl-btn" onclick="changeAudioIndex(1)">Next ⏭</button>
+<!-- Full Screen Audio Player Modal with Visualizer & User Profile -->
+<div class="full-audio-modal" id="fullAudioModal">
+  <div class="full-audio-card">
+    <button class="close-panel" onclick="closeFullAudioModal()" style="position:absolute;top:15px;right:20px;font-size:24px;">&times;</button>
+    <h3 style="color:var(--primary-color);margin-bottom:15px;">🎵 Advanced Audio Visualizer Hub</h3>
+    
+    <div class="audio-profile-container">
+      <img id="modalAudioAvatar" src="" class="audio-user-avatar" alt="User Profile">
+    </div>
+
+    <p id="fullAudioTitle" style="font-weight:bold;font-size:16px;margin-bottom:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">No Audio Loaded</p>
+    
+    <!-- Audio Visualizer Canvas -->
+    <canvas id="visualizerCanvas" class="visualizer-canvas" width="480" height="60"></canvas>
+
+    <audio id="fullAudioEl" controls style="width:100%;margin-bottom:15px;"></audio>
+    
+    <div class="player-controls">
+      <button class="ctrl-btn" onclick="changeAudioIndex(-1)">⏮ Prev</button>
+      <button class="ctrl-btn" onclick="skipAudioTime(-10)">⏪ -10s</button>
+      <button class="ctrl-btn" onclick="togglePlayPauseAudio()">⏯ Play/Pause</button>
+      <button class="ctrl-btn" onclick="skipAudioTime(10)">+10s ⏩</button>
+      <button class="ctrl-btn" onclick="changeAudioIndex(1)">Next ⏭</button>
+    </div>
   </div>
 </div>
 
-<button class="open-audio-floating-btn" id="openAudioFloatingBtn" onclick="openDedicatedAudioBox()">🎵 Open Audio Player</button>
+<button class="open-audio-modal-btn" id="openAudioModalBtn" onclick="openFullAudioModal()">🎵 Open Audio Player</button>
 
 <!-- Video / Image Player Modal -->
 <div class="player-modal" id="advancedPlayerModal">
@@ -221,6 +235,12 @@ let currentActiveCategory = 'videos';
 let currentMediaList = [];
 let currentIndex = 0;
 let audioIndex = 0;
+
+// Audio Visualizer & Web Audio API Variables
+let audioCtx = null;
+let analyser = null;
+let sourceNode = null;
+let visualizerAnimationId = null;
 
 let dbInstance = null;
 function initIndexedDB() {
@@ -371,7 +391,7 @@ document.getElementById('authForm').addEventListener('submit', async function(e)
   submitBtn.innerHTML = `<span>${isLoginMode ? "Login" : "Register Now"}</span>`;
 });
 
-// Crash-Free Folder Upload using Object URL & IndexedDB
+// Crash-Free Folder Upload
 document.getElementById('addMediaForm').addEventListener('submit', async function(e) {
   e.preventDefault();
   const folderInput = document.getElementById('mediaFolderInput');
@@ -469,12 +489,11 @@ window.loadMediaCategory = async function(category) {
     listEl.appendChild(div);
   });
 
-  // Agar Audio category select ki gayi hai, toh floating audio player button show karein
   if(category === 'audios' && currentMediaList.length > 0) {
-    document.getElementById('openAudioFloatingBtn').classList.add('active');
+    document.getElementById('openAudioModalBtn').classList.add('active');
   } else {
-    document.getElementById('openAudioFloatingBtn').classList.remove('active');
-    document.getElementById('dedicatedAudioBox').classList.remove('active');
+    document.getElementById('openAudioModalBtn').classList.remove('active');
+    document.getElementById('fullAudioModal').classList.remove('active');
   }
 };
 
@@ -489,7 +508,7 @@ window.openAdvancedPlayer = function() {
   }
 
   if(currentActiveCategory === 'audios') {
-    openDedicatedAudioBox();
+    openFullAudioModal();
     return;
   }
 
@@ -503,53 +522,110 @@ window.closeAdvancedPlayer = function() {
   document.getElementById('playerDisplayArea').innerHTML = '';
 };
 
-// Dedicated Audio Player Controls Logic
-window.openDedicatedAudioBox = function() {
+// Full Screen Advanced Audio Player Logic with Visualizer & Profile Avatar
+window.openFullAudioModal = function() {
   if(currentActiveCategory !== 'audios' || currentMediaList.length === 0) {
     alert("Pehle Audios category select karein aur audio files upload karein!");
     return;
   }
-  document.getElementById('dedicatedAudioBox').classList.add('active');
-  document.getElementById('openAudioFloatingBtn').classList.remove('active');
-  loadAudioInFloatingPlayer(audioIndex);
+  let user = JSON.parse(localStorage.getItem('miPlayerUser') || '{}');
+  document.getElementById('modalAudioAvatar').src = user.pic || "https://via.placeholder.com/150";
+  document.getElementById('fullAudioModal').classList.add('active');
+  document.getElementById('openAudioModalBtn').classList.remove('active');
+  loadAudioInFullPlayer(audioIndex);
 };
 
-window.closeDedicatedAudioBox = function() {
-  document.getElementById('dedicatedAudioBox').classList.remove('active');
+window.closeFullAudioModal = function() {
+  document.getElementById('fullAudioModal').classList.remove('active');
   if(currentActiveCategory === 'audios' && currentMediaList.length > 0) {
-    document.getElementById('openAudioFloatingBtn').classList.add('active');
+    document.getElementById('openAudioModalBtn').classList.add('active');
   }
+  if(visualizerAnimationId) cancelAnimationFrame(visualizerAnimationId);
 };
 
 window.launchAudioPlayerFromList = function(index) {
   audioIndex = index;
-  openDedicatedAudioBox();
+  openFullAudioModal();
 };
 
-function loadAudioInFloatingPlayer(idx) {
+function loadAudioInFullPlayer(idx) {
   if(currentMediaList.length === 0) return;
   audioIndex = idx;
   const item = currentMediaList[audioIndex];
-  document.getElementById('audioBoxTitle').innerText = `${audioIndex + 1}. ${item.title}`;
-  const audioEl = document.getElementById('floatingAudioEl');
+  document.getElementById('fullAudioTitle').innerText = `${audioIndex + 1}. ${item.title}`;
+  const audioEl = document.getElementById('fullAudioEl');
   audioEl.src = item.url;
   audioEl.play().catch(e => {});
+
+  setupAudioVisualizer(audioEl);
+}
+
+function setupAudioVisualizer(audioElement) {
+  if(!audioCtx) {
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    audioCtx = new AudioContext();
+  }
+  if(audioCtx.state === 'suspended') {
+    audioCtx.resume();
+  }
+
+  if(!sourceNode) {
+    try {
+      sourceNode = audioCtx.createMediaElementSource(audioElement);
+      analyser = audioCtx.createAnalyser();
+      analyser.fftSize = 64;
+      sourceNode.connect(analyser);
+      analyser.connect(audioCtx.destination);
+    } catch(e) {}
+  }
+
+  visualizeAudio();
+}
+
+function visualizeAudio() {
+  const canvas = document.getElementById('visualizerCanvas');
+  if(!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const bufferLength = analyser ? analyser.frequencyBinCount : 16;
+  const dataArray = new Uint8Array(bufferLength);
+
+  function draw() {
+    visualizerAnimationId = requestAnimationFrame(draw);
+    if(analyser) {
+      analyser.getByteFrequencyData(dataArray);
+    }
+
+    ctx.fillStyle = '#000000';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    const barWidth = (canvas.width / bufferLength) * 2.5;
+    let x = 0;
+
+    for(let i = 0; i < bufferLength; i++) {
+      let barHeight = dataArray[i] / 2;
+      ctx.fillStyle = `rgb(${barHeight + 100}, 38, 235)`;
+      ctx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
+      x += barWidth + 1;
+    }
+  }
+  if(visualizerAnimationId) cancelAnimationFrame(visualizerAnimationId);
+  draw();
 }
 
 window.changeAudioIndex = function(dir) {
   audioIndex += dir;
   if(audioIndex < 0) audioIndex = currentMediaList.length - 1;
   if(audioIndex >= currentMediaList.length) audioIndex = 0;
-  loadAudioInFloatingPlayer(audioIndex);
+  loadAudioInFullPlayer(audioIndex);
 };
 
 window.skipAudioTime = function(sec) {
-  const audioEl = document.getElementById('floatingAudioEl');
+  const audioEl = document.getElementById('fullAudioEl');
   if(audioEl) audioEl.currentTime += sec;
 };
 
-window.togglePlayPauseAudioBox = function() {
-  const audioEl = document.getElementById('floatingAudioEl');
+window.togglePlayPauseAudio = function() {
+  const audioEl = document.getElementById('fullAudioEl');
   if(audioEl) {
     if(audioEl.paused) audioEl.play();
     else audioEl.pause();
@@ -624,7 +700,7 @@ window.closeUserInfoModal = function() {
 };
 
 window.showDeveloperInfo = function() {
-  alert("Kaushal Mi Player v3.6\nDeveloped by Computer Skills by Kaushalji");
+  alert("Kaushal Mi Player v3.7\nDeveloped by Computer Skills by Kaushalji");
   toggleAppMenu();
 };
 
